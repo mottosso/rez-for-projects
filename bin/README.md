@@ -1,1 +1,1 @@
-Aliases, for Windows
+Aliases, for Windows. On Unix, these are available as Bash aliases.
