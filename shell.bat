@@ -6,18 +6,8 @@ IF ERRORLEVEL 1 (
 	goto end
 )
 
-:: Install packages here
-set REZ_LOCAL_PACKAGES_PATH=%~dp0.packages
-
-:: Look for packages here
-set REZ_PACKAGES_PATH=%~dp0.packages
-
-:: Expose re, alias for rez env
-set PATH=%~dp0bin;%PATH%
-
-set PROMPT=$$ 
-
-call cat %~dp0banner.txt
+call %~dp0.rez\env.bat
+call type %~dp0.rez\banner.txt
 call cmd /k
 exit 0
 
