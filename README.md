@@ -2,7 +2,7 @@
 
 An example of how Rez could be used to version both software and project configurations.
 
-![rez_running](https://user-images.githubusercontent.com/2152766/56455060-cf201d80-6351-11e9-93af-d6ae0721bb4e.gif)
+![Untitled Project](https://user-images.githubusercontent.com/2152766/56455523-270d5300-6357-11e9-9f00-0e870af29372.gif)
 
 <br>
 
@@ -82,6 +82,8 @@ $ command-line >     | alita |       | maya |
 <br>
 
 ### Usage
+
+![rez_running](https://user-images.githubusercontent.com/2152766/56455060-cf201d80-6351-11e9-93af-d6ae0721bb4e.gif)
 
 **Prerequisites**
 
