@@ -1,0 +1,21 @@
+ ==============================
+
+  Welcome to rez-for-projects!
+
+ This demo illustrates how projects
+ and software can happily co-exist
+           with Rez.
+
+ ==============================
+
+ Usage
+ -----
+ 
+ $ rez env         # Establish a Rez environment
+ $ re              # ..using an alias
+ $ re alita        # In a given project
+ $ re alita maya   # With a given application
+
+ $ rez build --install  # Edit and release new package
+ $ ri                   # ..using an alias
+

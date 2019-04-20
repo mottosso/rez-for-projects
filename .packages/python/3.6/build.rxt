@@ -1,0 +1,51 @@
+{
+    "default_patch_lock": "no_lock",
+    "rez_version": "2.29.0",
+    "package_requests": [
+        "pip-19"
+    ],
+    "serialize_version": "4.3",
+    "resolved_packages": [
+        {
+            "variables": {
+                "index": null,
+                "version": "19.0.3",
+                "repository_type": "filesystem",
+                "location": "C:\\Users\\manima\\Dropbox\\dev\\anima\\github\\mottosso\\rez-for-projects\\.packages",
+                "name": "pip"
+            },
+            "key": "filesystem.variant"
+        }
+    ],
+    "num_loaded_packages": 1,
+    "status": "solved",
+    "implicit_packages": [
+        "~platform==windows",
+        "~arch==AMD64",
+        "~os==windows-10.0.17134"
+    ],
+    "host": "toy.fritz.box",
+    "user": "manima",
+    "package_filter": [],
+    "arch": "AMD64",
+    "solve_time": 0.0,
+    "building": true,
+    "requested_timestamp": null,
+    "parent_suite_path": null,
+    "suite_context_name": null,
+    "package_orderers": null,
+    "graph": "{'nodes': [((('fillcolor', '#AAFFAA'), ('fontsize', 10), ('style', 'filled')), [('_5', 'pip-19.0.3[]')]), ((('fillcolor', '#FFFFAA'), ('fontsize', 10), ('style', 'filled,dashed')), [('_4', '~os==windows-10.0.17134'), ('_3', '~arch==AMD64'), ('_2', '~platform==windows'), ('_1', 'pip-19')])], 'edges': [((('arrowsize', '0.5'),), [('_1', '_5')])]}",
+    "failure_description": null,
+    "created": 1555745894,
+    "package_paths": [
+        "C:\\Users\\manima\\Dropbox\\dev\\anima\\github\\mottosso\\rez-for-projects\\.packages"
+    ],
+    "platform": "windows",
+    "rez_path": "c:\\users\\manima\\dropbox\\dev\\anima\\rez2\\lib\\site-packages\\rez-2.29.0-py2.7.egg\\rez",
+    "patch_locks": {},
+    "from_cache": false,
+    "timestamp": 1555745894,
+    "caching": true,
+    "load_time": 0.0,
+    "os": "windows-10.0.17134"
+}
