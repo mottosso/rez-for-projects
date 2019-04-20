@@ -5,11 +5,15 @@ build_command = False
 
 
 def commands():
+    import os
     global env
     global system
 
     if system.platform == "windows":
-        env["PATH"].prepend(r"c:\program files\autodesk\maya2019\bin")
+        path = r"c:\program files\autodesk\maya2019\bin"
 
     elif system.platform == "linux":
-        env["PATH"].prepend("/opt/maya2019/bin")
+        path = "/opt/maya2019/bin"
+
+    assert os.path.exists(path), "Missing files: %s" % path
+    env["PATH"].prepend(path)

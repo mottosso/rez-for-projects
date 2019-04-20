@@ -7,14 +7,18 @@ version = '2018.0.1'
 requires = []
 
 def commands():
+    import os
     global env
     global system
     
     if system.platform == "windows":
-        env["PATH"].prepend(r"c:\program files\autodesk\maya2018\bin")
+        path = r"c:\program files\autodesk\maya2018\bin"
     
     elif system.platform == "linux":
-        env["PATH"].prepend("/opt/maya2018/bin")
+        path = "/opt/maya2018/bin"
+    
+    assert os.path.exists(path), "Missing files: %s" % path
+    env["PATH"].prepend(path)
 
 timestamp = 1555699198
 

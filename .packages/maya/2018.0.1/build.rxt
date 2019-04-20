@@ -15,7 +15,7 @@
     "user": "manima",
     "package_filter": [],
     "arch": "AMD64",
-    "solve_time": 0.0009999275207519531,
+    "solve_time": 0.0010001659393310547,
     "building": true,
     "requested_timestamp": null,
     "parent_suite_path": null,
@@ -23,7 +23,7 @@
     "package_orderers": null,
     "graph": "{'nodes': [((('fillcolor', '#FFFFAA'), ('fontsize', 10), ('style', 'filled,dashed')), [('_3', '~os==windows-10.0.17134'), ('_2', '~arch==AMD64'), ('_1', '~platform==windows')])], 'edges': []}",
     "failure_description": null,
-    "created": 1555699198,
+    "created": 1555755473,
     "package_paths": [
         "C:\\Users\\manima\\Dropbox\\dev\\anima\\github\\mottosso\\rez-for-projects\\.packages"
     ],
@@ -31,7 +31,7 @@
     "rez_path": "c:\\users\\manima\\dropbox\\dev\\anima\\rez2\\lib\\site-packages\\rez-2.29.0-py2.7.egg\\rez",
     "patch_locks": {},
     "from_cache": false,
-    "timestamp": 1555699197,
+    "timestamp": 1555755473,
     "caching": true,
     "load_time": 0.0,
     "os": "windows-10.0.17134"
