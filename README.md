@@ -176,6 +176,8 @@ $ ./build_all
 $ ./shell
 ```
 
+![autobuild](https://user-images.githubusercontent.com/2152766/56460565-6d38d580-639c-11e9-8f7e-76290cde60ac.gif)
+
 > The build script will make contained packages available for resolve
 
 The shell script configures Rez to look for packages in this repository, exposes aliases `re` and `ri` for common Rez commands and provides you with a greeting message. It does not implement any custom behavior, everything is native to Rez.
