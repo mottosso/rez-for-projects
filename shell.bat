@@ -12,11 +12,6 @@ set REZ_LOCAL_PACKAGES_PATH=%~dp0.packages
 :: Look for packages here
 set REZ_PACKAGES_PATH=%~dp0.packages
 
-:: Expose rezutils.py to build step
-rem set PYTHONPATH=%~dp0python
-rem set REZ_PACKAGE_DEFINITION_BUILD_PYTHON_PATHS=%~dp0python
-rem set REZ_PACKAGE_DEFINITION_PYTHON_PATH=%~dp0python
-
 :: Expose re, alias for rez env
 set PATH=%~dp0bin;%PATH%
 
