@@ -2,6 +2,7 @@ name = "alita"
 version = "0.3.17"
 
 requires = [
+    "rezutils-1",
     "base-1",
     "python-2.7",
 

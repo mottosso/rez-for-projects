@@ -7,8 +7,8 @@ environ = {
 }
 
 requires = [
-    "python>=2.7,<4"
     "rezutils-1",
+    "python>=2.7,<4",
 ]
 
 

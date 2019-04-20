@@ -2,9 +2,7 @@
 
 name = "python"
 version = "3.6"
-requires = [
-    "pip-19",
-]
+requires = []
 
 environ = {
     "PYTHONDONTWRITEBYTECODE": "1",
@@ -23,7 +21,7 @@ def commands():
     global expandvars
 
     if system.platform == "windows":
-        exe = r"c:\python27\python.exe"
+        exe = r"c:\python36\python.exe"
         env.PATH.append(os.path.dirname(exe))
     else:
         exe = "/usr/bin/python3.6"

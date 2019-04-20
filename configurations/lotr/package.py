@@ -2,6 +2,7 @@ name = "lotr"
 version = "1.13.2"
 
 requires = [
+    "rezutils-1",
     "base-1",
 
     # DCCs

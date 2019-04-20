@@ -2,9 +2,7 @@
 
 name = "python"
 version = "2.7"
-requires = [
-    "pip-19",
-]
+requires = []
 environ = {
     "PYTHONDONTWRITEBYTECODE": "1",
 }

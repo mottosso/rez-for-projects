@@ -1,5 +1,6 @@
 import os
 import sys
+import stat
 import time
 import errno
 import shutil
@@ -30,11 +31,14 @@ RETRY = 3
 
 def retry(func):
     def decorator(*args, **kwargs):
+        kwargs["attempt"] = 0
+
         for retry in range(RETRY):
             try:
                 return func(*args, **kwargs)
             except Exception:
-                tell("Retrying..", 3)
+                kwargs["attempt"] += 1
+                tell("Retrying (%d/%d).." % (retry + 1, RETRY), 3)
                 time.sleep(0.2 * retry + 0.2)
             else:
                 break
@@ -65,7 +69,7 @@ def ignored(abspath):
 
 
 @retry
-def makedirs(path):
+def makedirs(path, attempt=0):
     dirname = os.path.dirname(path)
 
     try:
@@ -96,7 +100,7 @@ def generate_manifest(root):
 
 
 @retry
-def clean(root):
+def clean(root, attempt=0):
     for base, dirs, files in os.walk(root):
         # All directories
         for dirname in dirs:
@@ -107,12 +111,19 @@ def clean(root):
         # And files
         for fname in files:
             abspath = os.path.join(base, fname)
-            tell("Removing file %s" % fname, 6)
+
+            if attempt == 0:
+                tell("Removing file %s" % fname, 6)
+
+            if attempt == 1:
+                tell("Editing file permissions..", 6)
+                os.chmod(abspath, stat.S_IWRITE | stat.S_IREAD)
+
             os.remove(abspath)
 
 
 @retry
-def copy_with_retry(src, dst):
+def copy_with_retry(src, dst, attempt=0):
     shutil.copyfile(src, dst)
 
 
