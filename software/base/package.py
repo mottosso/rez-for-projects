@@ -2,12 +2,14 @@
 
 name = "base"
 version = "1.2.1"
-requires = []
+requires = [
+    "ftrack-1",
+    "gitlab-1",
+]
 
 environ = {
     "GITLAB_URI": "https://gitlab.mycompany.co.jp",
-
-    "PROJECTS_PATH": "{this.projects_root}"
+    "PROJECTS_PATH": "{this.projects_path}"
 }
 
 build_command = False
@@ -22,9 +24,9 @@ def commands():
     # Base handles all differences between OSes
     # No reference to `system.platform` is made elsewhere
     if system.platform == "windows":
-        this.projects_root = r"\\server\nas\projects"
+        this.projects_path = r"\\server\nas\projects"
     else:
-        this.projects_root = "/mnt/projects"
+        this.projects_path = "/mnt/projects"
 
     for key, value in this.environ.items():
         if isinstance(value, (tuple, list)):

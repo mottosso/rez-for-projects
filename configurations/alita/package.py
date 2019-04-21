@@ -3,6 +3,8 @@ late = locals()["late"]
 name = "alita"
 version = "0.3.17"
 
+build_command = "python -m rezutils {root}"
+
 private_build_requires = [
     "rezutils-1",
 ]
