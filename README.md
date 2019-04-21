@@ -1,6 +1,8 @@
 ### Rez for Projects
 
-An example of how Rez could be used to version both software and project configurations.
+An example of how [Rez](https://github.com/nerdvegas/rez) could be used to version both software and project configurations.
+
+- [Conversation](https://groups.google.com/forum/#!topic/rez-config/ni5CK2pxj38)
 
 ![Untitled Project](https://user-images.githubusercontent.com/2152766/56455523-270d5300-6357-11e9-9f00-0e870af29372.gif)
 
