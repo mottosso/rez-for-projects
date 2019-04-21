@@ -1,5 +1,8 @@
 name = "rezutils"
 version = "1.0"
+requires = [
+    "python>=2.7,<4",
+]
 
 
 def commands():

@@ -11,6 +11,8 @@ environ = {
     ],
 }
 
+build_command = "python -m rezutils {root}"
+
 
 def commands():
     global env

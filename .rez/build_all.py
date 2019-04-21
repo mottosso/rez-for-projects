@@ -11,9 +11,11 @@ repodir = os.path.dirname(dirname)
 # Some packages depend on other packages
 # having been built first.
 order = [
-    "rezutils",
-    "base",
     "python",
+    "rezutils",
+    "ftrack",
+    "gitlab",
+    "base",
     "core_pipeline",
     "maya",
     "maya_base",

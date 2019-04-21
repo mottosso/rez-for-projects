@@ -5,6 +5,8 @@ private_build_requires = [
     "rezutils-1",
 ]
 
+build_command = "python -m rezutils {root}"
+
 requires = [
     "~maya>=2016,<2019",
 ]

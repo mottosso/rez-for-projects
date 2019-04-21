@@ -31,6 +31,9 @@ RETRY = 3
 
 def retry(func):
     def decorator(*args, **kwargs):
+
+        # Give targets a chance to handle
+        # each retry differently
         kwargs["attempt"] = 0
 
         for retry in range(RETRY):
@@ -39,7 +42,10 @@ def retry(func):
             except Exception:
                 kwargs["attempt"] += 1
                 tell("Retrying (%d/%d).." % (retry + 1, RETRY), 3)
-                time.sleep(0.2 * retry + 0.2)
+
+                # Wait increasingly longer
+                time.sleep(0.5 * (retry or 0.2))
+
             else:
                 break
         else:
@@ -158,3 +164,30 @@ def build(source_path, build_path, install_path, targets):
 
     if "install" in (targets or []):
         _install()
+
+
+if __name__ == '__main__':
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("source_path")
+    parser.add_argument("--ignore", default=",".join(IGNORE))
+    parser.add_argument("--retries", type=int, default=RETRY)
+    parser.add_argument("--build_path",
+                        default=os.getenv("REZ_BUILD_PATH"))
+    parser.add_argument("--install_path",
+                        default=os.getenv("REZ_BUILD_INSTALL_PATH"))
+    parser.add_argument("--install", type=bool,
+                        default=bool(os.getenv("REZ_BUILD_INSTALL")))
+
+    opts = parser.parse_args()
+
+    if opts.ignore:
+        IGNORE = opts.ignore.split(",")
+
+    targets = ["install"] if opts.install else []
+
+    build(opts.source_path,
+          opts.build_path,
+          opts.install_path,
+          targets)
