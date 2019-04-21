@@ -2,7 +2,6 @@ name = "lotr"
 version = "1.13.2"
 
 requires = [
-    "rezutils-1",
     "base-1",
 
     # DCCs
@@ -10,6 +9,10 @@ requires = [
     "~nuke-9",
     "~houdinifx-11",
     "~mari-0.2",
+]
+
+private_build_requires = [
+    "rezutils-1",
 ]
 
 environ = {

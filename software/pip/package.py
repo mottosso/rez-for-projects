@@ -7,8 +7,11 @@ environ = {
 }
 
 requires = [
-    "rezutils-1",
     "python>=2.7,<4",
+]
+
+private_build_requires = [
+    "rezutils-1",
 ]
 
 

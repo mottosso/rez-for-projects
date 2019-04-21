@@ -1,7 +1,7 @@
 name = "pyblish_base"
 version = "1.4.2"
 
-requires = [
+private_build_requires = [
     "rezutils-1",
 ]
 
