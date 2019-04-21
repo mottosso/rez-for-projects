@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+exec $MAYA_BIN_DIR\render %*
