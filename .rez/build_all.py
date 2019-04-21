@@ -1,5 +1,7 @@
 import os
 import sys
+import time
+import shutil
 import argparse
 import subprocess
 
@@ -28,8 +30,28 @@ print("Auto-building..")
 print("")
 print("-" * 30)
 
+packagesdir = os.path.join(repodir, ".packages")
+_, existing, _ = next(os.walk(packagesdir))  # just directories
+
+if existing:
+    sys.stdout.write("Cleaning existing packages.. ")
+
+    for attempt in range(3):
+        try:
+            for package in existing:
+                shutil.rmtree(os.path.join(packagesdir, package))
+        except OSError:
+            print("Retrying..")
+            time.sleep(1)
+            continue
+        else:
+            break
+
+    print("all clean")
+
 count = 0
 
+print("Building packages..")
 for root in ("software", "configurations"):
     root = os.path.join(repodir, root)
 
