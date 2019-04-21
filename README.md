@@ -4,6 +4,22 @@ An example of how Rez could be used to version both software and project configu
 
 ![Untitled Project](https://user-images.githubusercontent.com/2152766/56455523-270d5300-6357-11e9-9f00-0e870af29372.gif)
 
+##### Previous versions of this repository
+
+This repo is complex; I've saved prior working versions in simpler conditions that you can checkout, whereby the README details what is available and what is missing.
+
+| Version | Description
+|:-------:|:-----------
+| [**`1.0`**](../../releases/tag/1.0) | Initial working version
+| [**`1.1`**](../../releases/tag/1.1) | Conditional requirements with `@late` and `private_build_requires`
+
+```bash
+$ git clone https://github.com/mottosso/rez-for-projects.git
+$ cd rez-for-projects
+$ git checkout 1.0
+$ ./build_all
+```
+
 <br>
 
 ### Features
@@ -12,6 +28,7 @@ An example of how Rez could be used to version both software and project configu
 - Per-application environment
 - Conditional requirements, e.g. `maya` and `alita` combined includes `mgear`
 - External and internal packages, i.e. pip and core_pipeline
+- Self-contained packages, i.e. `core_pipeline`
 - Locally referenced application packages, i.e. Python and Maya
 - Cross-platform application packages, i.e. Maya
 - Multi-versioned application packages, i.e. Maya 2017-2019 and Python 2.7-3.6
@@ -27,8 +44,7 @@ The project defines 3 types of Rez packages.
 | `software`      | Self-contained software distribution | `qt_py`, `pyblish_base`, `pip`
 | `reference`     | A software package whose payload reside elsewhere | `maya`, `python`
 | `bundle`        | Combines two or more packages | `alita`, `lotr`
-
-- [Terminology Reference](http://mottosso.github.io/bleeding-rez/#bundles)
+| | | [Terminology Reference](http://mottosso.github.io/bleeding-rez/#bundles)
 
 <br>
 
@@ -129,14 +145,36 @@ $ command-line >     | alita |       | maya |
 
 Some combinations of packages give rise to intelligent behavior.
 
+```bash
+$ re alita maya
+```
+
+```
+                      ________________________
+                     |                        |
+$ command-line >     |      alita + maya      |
+                     |________________________|
+                       /   \           \      \
+- - - - - - - - - - - / - - \ - - - - - \ - - -\- - - - - - - - - - - 
+                    _/___   _\___    ____\____  \_______
+                   |     | |     |  |         | |       |
+                   | ... | | ... |  | pyblish | | mgear |   resolved
+                   |_____| |_____|  |_________| |_______|
+                                           
+```
+
+Because `alita` was included, `maya` is given extra requirements.
+
+**Properties**
+
 - Resolving an environment with only `maya` yields a "vanilla" environment whereby the *latest version* of Maya is present.
 - Resolving an environment with only `alita` yields a "vanilla" environment whereby the *latest version* of this project and its environment is present.
 
-Additionally:
+**Additionally**
 
 - Resolving an environment with both `maya` and `alita` yields an environment whereby:
-    - A *specific version* of `maya` is present, one compatible with `maya`, via the weak reference `~maya-2018`
-    - A specific set of requirements are included, relevant to both the project and application, such as `mGear` or `pyblish`, via the `@late` decorator of `requires()`
+    1. A *specific version* of `maya` is present, one compatible with `maya`, via the weak reference `~maya-2018`
+    1. A specific set of requirements are included, relevant to both the project and application, such as `mGear` or `pyblish`, via the `@late` decorator of `requires()`
 
 **Specific version of Maya to a given project**
 
@@ -156,24 +194,22 @@ requires = [
 name = "alita"
 version = "1.0"
 
-_requires = [
-    "~maya-2018",
-]
-
 @late()
 def requires():
     if in_context() and "maya" in request:
-        return _requires + ["mgear-1"]
+        return ["mgear-1"]
 
     if in_context() and "nuke" in request:
-        return _requires + ["optflow-3.5"]
+        return ["optflow-3.5"]
 
-    return _requires
+    return []
 ```
 
 <br>
 
 ### This Repository
+
+Below is the structure and layout of this repository.
 
 | Directory       | Description
 |:----------------|:----------
