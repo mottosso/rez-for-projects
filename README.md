@@ -10,6 +10,7 @@ An example of how Rez could be used to version both software and project configu
 
 - Per-project environment
 - Per-application environment
+- Conditional requirements, e.g. `maya` and `alita` combined includes `mgear`
 - External and internal packages, i.e. pip and core_pipeline
 - Locally referenced application packages, i.e. Python and Maya
 - Cross-platform application packages, i.e. Maya
@@ -23,9 +24,11 @@ The project defines 3 types of Rez packages.
 
 | Package Type    | Description           | Examples
 |:----------------|:----------------------|:-------
-| `software`      | Self-contained software distribution | `Qt.py`, `pyblish-base`, `pip`
-| `reference`     | A software package whose payload reside elsewhere | `Maya`, `Python`
-| `configuration` | Combines two or more packages | `Alita`, `Lord of the Rings`
+| `software`      | Self-contained software distribution | `qt_py`, `pyblish_base`, `pip`
+| `reference`     | A software package whose payload reside elsewhere | `maya`, `python`
+| `bundle`        | Combines two or more packages | `alita`, `lotr`
+
+- [Terminology Reference](http://mottosso.github.io/bleeding-rez/#bundles)
 
 <br>
 
@@ -33,7 +36,7 @@ The project defines 3 types of Rez packages.
     <tr>
         <th>Software Package</th>
         <th>Reference Package</th>
-        <th>Configuration Package</th>
+        <th>Bundle Package</th>
     </tr>
     <tr></tr>
     <tr>
@@ -122,6 +125,54 @@ $ command-line >     | alita |       | maya |
 
 <br>
 
+### Conditional Requirements
+
+Some combinations of packages give rise to intelligent behavior.
+
+- Resolving an environment with only `maya` yields a "vanilla" environment whereby the *latest version* of Maya is present.
+- Resolving an environment with only `alita` yields a "vanilla" environment whereby the *latest version* of this project and its environment is present.
+
+Additionally:
+
+- Resolving an environment with both `maya` and `alita` yields an environment whereby:
+    - A *specific version* of `maya` is present, one compatible with `maya`, via the weak reference `~maya-2018`
+    - A specific set of requirements are included, relevant to both the project and application, such as `mGear` or `pyblish`, via the `@late` decorator of `requires()`
+
+**Specific version of Maya to a given project**
+
+```python
+# alita/package.py
+name = "alita"
+version = "1.0"
+requires = [
+    "~maya-2018",
+]
+```
+
+**Specific set of requirements to a given combination of project and application**
+
+```python
+# alita/package.py
+name = "alita"
+version = "1.0"
+
+_requires = [
+    "~maya-2018",
+]
+
+@late()
+def requires():
+    if in_context() and "maya" in request:
+        return _requires + ["mgear-1"]
+
+    if in_context() and "nuke" in request:
+        return _requires + ["optflow-3.5"]
+
+    return _requires
+```
+
+<br>
+
 ### This Repository
 
 | Directory       | Description
@@ -148,7 +199,8 @@ $ command-line >     | alita |       | maya |
 | **`maya/`**           | System reference to Maya-2017-2019
 | **`nuke/`**           | System reference to Nuke-11v3.2
 | **`python/`**         | System reference to Python-2.7 and -3.6
-| **`core_pipeline/`**  | Internal project
+| **`core_pipeline/`**  | Internal project from local GitLab
+| **`mgear/`**          | Internal project from local GitLab
 | **`pyblish_base/`**   | External package from pip
 | **`pip/`**            | Self-contained version of pip-19
 
@@ -172,17 +224,16 @@ On either Windows or Unix, run the below.
 $ git clone https://github.com/mottosso/rez-for-projects.git
 $ cd rez-for-projects
 $ ./build_all
-...
-$ ./shell
 ```
 
 ![autobuild](https://user-images.githubusercontent.com/2152766/56460565-6d38d580-639c-11e9-8f7e-76290cde60ac.gif)
 
 > The build script will make contained packages available for resolve
 
-The shell script configures Rez to look for packages in this repository, exposes aliases `re` and `ri` for common Rez commands and provides you with a greeting message. It does not implement any custom behavior, everything is native to Rez.
+Now enter a shell.
 
 ```bash
+$ ./shell
  ==============================
 
   Welcome to rez-for-projects!
@@ -207,7 +258,7 @@ The shell script configures Rez to look for packages in this repository, exposes
 $ 
 ```
 
-> If `rez` wasn't found, a helpful message is printed.
+The shell script configures Rez to look for packages in this repository, exposes aliases `re` and `ri` for common Rez commands and provides you with a greeting message. It does not implement any custom behavior, everything is native to Rez.
 
 <br>
 
@@ -227,6 +278,7 @@ Both software and configurations are plain Rez packages, and are installed with 
 - `maya_base` likewise, represents shared Maya requirements and environment variables
 - `alita` and `lotr` are "configurations", in that they represent a project, rather than software
 - `alita` is associated to version 2018 of Maya, via a "weak reference"
+- Combinations of two or more packages result in a specific list of requirements and environment variables via the `@late` decorator.
 
 <br>
 
@@ -234,9 +286,7 @@ Both software and configurations are plain Rez packages, and are installed with 
 
 Here are some of the things I'd like to happen but haven't figured out how to do yet.
 
-- **Dynamic Requirements** I'd like to associate Pyblish with Maya, but only when run alongside `alita`, not `lotr`.
-- **Overwriting Installs** Every install overwrites a prior install, that's bad. I'd like for an argument to be passed to `rez build` to explicitly allow overwriting.
-- **Rezutils requirement** I'd like for standalone packages, like Pyblish, to not depend on an internal `rezutils` package to be built.
+- **Overrides** If `/projects/alita/rez` is on the `REZ_PACKAGE_PATH`, then the contained `maya/package.py` should override the studio-wide Maya configuration for this project.
 
 <br>
 

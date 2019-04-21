@@ -1,8 +1,13 @@
+late = locals()["late"]
+
 name = "alita"
 version = "0.3.17"
 
-requires = [
+private_build_requires = [
     "rezutils-1",
+]
+
+build_requires = [
     "base-1",
     "python-2.7",
 
@@ -14,6 +19,18 @@ requires = [
     "~aftereffects-cs6",
     "~photoshop-2018",
 ]
+
+# Shared requirements, used by all DCCs
+dcc_requires = [
+    "pyblish_base-1.4",
+]
+
+# DCC-specific requirements
+maya_requires = dcc_requires + [
+    "mgear-2.4",
+]
+
+nuke_requires = dcc_requires + []
 
 environ = {
     "PROJECT_NAME": "Alita",
@@ -46,6 +63,22 @@ maya_environ = {
         "{root}/maya/shelves/icons"
     ],
 }
+
+
+@late()
+def requires():
+    global this
+    global request
+    global in_context
+    requires = this.build_requires[:]
+
+    if in_context() and "maya" in request:
+        requires += this.maya_requires
+
+    if in_context() and "nuke" in request:
+        requires += this.nuke_requires
+
+    return requires
 
 
 def commands():
