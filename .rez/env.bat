@@ -21,6 +21,8 @@ set PATH=%~dp0..\bin;%PATH%
 
 set PROMPT=$$ 
 
+goto success
+
 :norez
     echo ---------------------------------
     echo Rez was not found on your PATH :(
@@ -34,3 +36,5 @@ set PROMPT=$$
     echo ---------------------------------
     pause
     exit 1
+
+:success
