@@ -16,9 +16,7 @@ def commands():
     global building
 
     if not building and "GITLAB_API_KEY" not in os.environ:
-        raise ValueError(
-            "Requires an GITLAB_API_KEY environment variable"
-        )
+        print("WARNING: GITLAB_API_KEY missing")
 
     for key, value in this.environ.items():
         env[key] = value

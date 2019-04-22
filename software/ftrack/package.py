@@ -21,9 +21,7 @@ def commands():
     # prevent packages that require this package from being
     # built without having the key avaiable.
     if not building and "FTRACK_API_KEY" not in os.environ:
-        raise ValueError(
-            "Requires an FTRACK_API_KEY environment variable"
-        )
+        print("WARNING: FTRACK_API_KEY missing")
 
     for key, value in this.environ.items():
         env[key] = value
