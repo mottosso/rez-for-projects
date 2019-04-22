@@ -1,2 +1,0 @@
-#!/usr/bin/env bash
-exec $MAYA_BIN_DIR/maya $MAYA_BIN_ARGS $*

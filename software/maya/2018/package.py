@@ -5,11 +5,7 @@ name = "maya"
 version = "2018.0.1"
 requires = []
 
-build_command = "python -m rezutils {root}"
-
-private_build_requires = [
-    "rezutils-1",
-]
+build_command = False
 
 # Cross-platform binaries (i.e. shell scripts)
 # are built and deployed with this package.
@@ -24,24 +20,27 @@ tools = [
 def commands():
     import os
     global env
+    global alias
     global system
 
     if system.platform == "windows":
-        path = r"c:\program files\autodesk\maya2018\bin"
+        bindir = r"c:\program files\autodesk\maya2018\bin\\"
 
     elif system.platform == "linux":
-        path = "/opt/maya2018/bin"
+        bindir = "/opt/maya2018/bin/"
 
-    assert os.path.exists(path), "Missing files: %s" % path
+    assert os.path.exists(bindir), "Missing files: %s" % bindir
 
-    env["MAYA_BIN_DIR"] = path
-    env["MAYA_BIN_ARGS"] = (
+    bindir = "\"%s\"" % bindir
+
+    # Add specific names to executables made
+    # available by this package.
+    alias("render", bindir + "render")
+    alias("maya", bindir + "maya" + (
 
         # Manage plug-in loading manually
-        "-noAutoloadPlugins" +
+        " -noAutoloadPlugins" +
 
         # Python 3 compatibility warnings
         " -3"
-    )
-
-    env["PATH"].prepend("{root}/bin")
+    ))
