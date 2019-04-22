@@ -1,10 +1,29 @@
 ### Rez for Projects
 
-An example of how [Rez](https://github.com/nerdvegas/rez) could be used to version both software and project configurations.
+An example and exploration of how and if [Rez](https://github.com/nerdvegas/rez) could be used to version both software and project configurations.
 
-- [Conversation](https://groups.google.com/forum/#!topic/rez-config/ni5CK2pxj38)
+- [Conversation on Google Groups](https://groups.google.com/forum/#!topic/rez-config/ni5CK2pxj38)
 
 ![Untitled Project](https://user-images.githubusercontent.com/2152766/56455523-270d5300-6357-11e9-9f00-0e870af29372.gif)
+
+**Table of contents**
+
+- [Prelude](#prelude)
+- [Features](#Features)
+- [How it works](#how-it-works)
+    - [Build versus Runtime Requirements](#build-versus-runtime-requirements)
+- [Requirement Network](#requirement-network)
+- [Conditional Requirements](#conditional-requirements)
+- [This Repository](#this-repository)
+- [Usage](#usage)
+- [Building](#building)
+- [Architecture](#architecture)
+- [Missing](#missing)
+- [FAQ](#faq)
+    - [Q: "Why Reference Packages?"](#q-why-reference-packages)
+    - [Q: "Why store project scripts with Package?"](#q-why-store-project-scripts-with-package)
+
+<br>
 
 ##### Previous versions of this repository
 
@@ -24,16 +43,232 @@ $ ./build_all
 
 <br>
 
+### Prelude
+
+> This repo assumes an experienced-level of familiarity with [Rez](https://github.com/nerdvegas/rez).
+
+Rez is primarily a framework for resolving dependencies required for building software; which help explain why a build step is required per default, why a `CMakeLists.txt` is presumed to reside alongside a package definition, and why requirements default to being [resolved at build-time](#build-versus-runtime-requirements) rather than run-time; `x` can't be built without `y` having been built first.
+
+This repo is different. It (mis)uses Rez primarily for resolving *environments*, in particular those involved in launching software for an appropriate context given some VFX project or asset within that project.
+
+It's not all upside down however; a lot of packages do contain Python modules or compiled Maya plug-ins in which case build system muscles are flexed in full.
+
+**Warnings**
+
+The community explicitly points out that Rez is not well suited for this purpose.
+
+- ["Rez is not a production environment management system"](http://mottosso.github.io/bleeding-rez/#what-is-rez-not) (Old, Rez-1 documentation)
+- ["Rez was not designed to manage production environments"](https://groups.google.com/d/msg/rez-config/ni5CK2pxj38/WREAh0XRBgAJ) (Allan, Google Groups conversation)
+- ["Rez makes a clear distinction between configuration management and package management"](https://groups.google.com/d/msg/rez-config/gnwd7EuOzmM/rh6KeSHV5pwJ) (Allan, Google Groups conversation)
+
+But if someone told you "ice cream wasn't designed for chocolate lava cake", would you listen? :)
+
+**Motivation**
+
+So why do it? Because:
+
+1. Complex use of a single system > simple use of multiple systems
+1. Complex use of a simple system > simple use of a complex system
+1. Complex use of an established system > simple use of an ad-hoc system
+1. Complex use of a system with a community > simple use of a solo-developed system
+
+So with all that out of the way, let's have a look at what's possible!
+
+<br>
+
 ### Features
 
-- Per-project environment
-- Per-application environment
-- Conditional requirements, e.g. `maya` and `alita` combined includes `mgear`
-- External and internal packages, i.e. pip and core_pipeline
-- Self-contained packages, i.e. `core_pipeline`
-- Locally referenced application packages, i.e. Python and Maya
-- Cross-platform application packages, i.e. Maya
-- Multi-versioned application packages, i.e. Maya 2017-2019 and Python 2.7-3.6
+<details>
+    <summary>Studio-wide environment</summary>
+    <table>
+        <tr>
+            <th align="left"><code>base</code></th>
+        </tr>
+        <tr>
+            <td>
+
+A top-level package represents the studio itself; containing environment and requirements passed down to every software and project package.
+
+</td>
+        </tr>
+    </table>
+</details>
+
+<details>
+    <summary>Per-project environment</summary>
+    <table>
+        <tr>
+            <th align="left"><code>alita</code></th>
+        </tr>
+        <tr>
+            <td>
+
+Every show is represented by a Project Package that encapsulates each unique requirement and environment variable, augmenting the studio-wide package `base`.
+
+</td>
+        </tr>
+    </table>
+</details>
+
+<details>
+    <summary>Third-party services</summary>
+    <table>
+        <tr>
+            <th align="left"><code>ftrack</code></th>
+        </tr>
+        <tr></tr>
+        <tr>
+            <td>
+
+This project refers to [ftrack](http://ftrack.com) for production tracking, but applies to any external or internal service; the package merely includes appropriate environment variables that point to the remote URI. For security, the API key necessary for actually logging in and reading/writing information is provided separately at the OS level. This also helps when the key needs to change or refresh for whatever reason; there is only ever 1 valid key at any point in time, so no versioning is required.<br><br>The `package.commands()` validates that this key exists, as the package is of no use without it.
+
+```bash
+$ set FTRACK_API_KEY=xyz123
+$ re ...
+```
+
+</td>
+        </tr>
+        <tr></tr>
+        <tr>
+            <td><code><b>gitlab</b></code></td>
+        </tr>
+        <tr></tr>
+        <tr>
+            <td>
+
+Like `ftrack`, a package for a self-hosted GitLab instance is also included, providing access to its Python and Ruby API via command-line and DCC, along with also requiring an API key to be of any use.
+
+</td>
+        </tr>
+    </table>
+</details>
+
+<details>
+    <summary>Per-package combination environment</summary>
+    <table>
+        <tr>
+            <th align="left"><code>alita</code></th>
+        </tr>
+        <tr></tr>
+        <tr>
+            <td>
+
+Some requirements only make sense in conjunction with two or more packages. For example, requesting `maya` gets you one environment, `alita` gets you another one but both `maya` and `alita` doesn't just get you their combined requirements and environment, but also `pyblish` and `mgear`; packages only relevant to `maya`, and only within the context of `alita`
+
+- See [Conditional Requirements](#conditional-requirements) for more
+
+</td>
+        </tr>
+    </table>
+</details>
+
+<details>
+    <summary>External and internal packages</summary>
+    <table>
+        <tr>
+            <th align="left"><code>pip</code>, <code>core_pipeline</code></th>
+        </tr>
+        <tr></tr>
+        <tr>
+            <td>
+
+Packages developed internally are managed on GitLab, cloned onto the local disk of a developer, and released on creating a new tag via the GitLab web-based UI.
+
+External packages from `pip` are released via `rez pip --install`.
+
+```bash
+$ rez pip --install Qt.py
+```
+
+</td>
+        </tr>
+    </table>
+</details>
+
+<details>
+    <summary>Self-contained packages</summary>
+    <table>
+        <tr>
+            <th align="left"><code>core_pipeline</code></th>
+        </tr>
+        <tr></tr>
+        <tr>
+            <td>
+
+Some packages in this project reference an external payload, like `maya`. Others are self-contained and can be copy/pasted between Rez repositories, even between studios.
+
+</td>
+        </tr>
+    </table>
+</details>
+
+<details>
+    <summary>Reference packages</summary>
+    <table>
+        <tr>
+            <th align="left"><code>maya</code></th>
+        </tr>
+        <tr></tr>
+        <tr>
+            <td>
+
+To save on disk space and avoid accessing static or large files over a potentially slow network connection, some packages carry their payload separate from their metadata.
+
+See [Reference Packages](#q-why-reference-packages) for more.
+
+</td>
+        </tr>
+    </table>
+</details>
+
+
+<details>
+    <summary>Cross-platform application packages</summary>
+    <table>
+        <tr>
+            <th align="left"><code>maya</code></th>
+        </tr>
+        <tr></tr>
+        <tr>
+            <td>
+
+The `maya` package looks the same on both Windows and Linux.
+
+</td>
+        </tr>
+    </table>
+</details>
+
+<details>
+    <summary>Multi-versioned application packages</summary>
+    <table>
+        <tr>
+            <th align="left"><code>maya</code></th>
+        </tr>
+        <tr></tr>
+        <tr>
+            <td>
+
+Because major versions of DCCs update independently, packages like `maya` differs from other packages; it consists of an individual package for each major version of Maya.
+
+```
+software/
+  maya/
+    2017/
+    2018/
+    2019/
+      package.py
+```
+
+Which means `maya-2017` may be updated to `maya-2017.5` despite not being latest.
+
+> **Developer Note** This isn't ideal; preferably there would only be 1 `maya` package, but I wasn't able to figure out how to go about it.
+
+</td>
+        </tr>
+    </table>
+</details>
 
 <br>
 
@@ -165,7 +400,7 @@ $ command-line >     |      alita + maya      |
                                            
 ```
 
-Because `alita` was included, `maya` is given extra requirements.
+Because `maya` was included, `alita` imbues it with extra requirements.
 
 **Properties**
 
@@ -209,7 +444,7 @@ def requires():
 
 <br>
 
-### This Repository
+## This Repository
 
 Below is the structure and layout of this repository.
 
@@ -244,15 +479,16 @@ Below is the structure and layout of this repository.
 
 <br>
 
-### Usage
+## Usage
 
 ![rez_running](https://user-images.githubusercontent.com/2152766/56455060-cf201d80-6351-11e9-93af-d6ae0721bb4e.gif)
 
 **Prerequisites**
 
 1. Windows, Linux or OSX
+1. [bleeding-rez](https://github.com/mottosso/bleeding-rez)
 1. `python` available on your PATH
-1. [`rez`](https://github.com/nerdvegas/rez) available on PATH
+1. `rez` available on PATH
 
 **Install**
 
@@ -320,15 +556,29 @@ Both software and configurations are plain Rez packages, and are installed with 
 
 <br>
 
-### Missing
+#### Build versus Runtime Requirements
 
-Here are some of the things I'd like to happen but haven't figured out how to do yet.
+Rez resolves requirements during build per default, because Rez is primarily designed to build software that depend on other software having been built first. It can also be made to resolve requirements when calling `rez env`, which I'll refer to as run-time requirements in this repo.
 
-- **Overrides** If `/projects/alita/rez` is on the `REZ_PACKAGE_PATH`, then the contained `maya/package.py` should override the studio-wide Maya configuration for this project.
+All packages in this project are *run-time* requirements, unless:
+
+1. It is used by another package during build
+
+The only package where this exception currently applies is `rezutils`
 
 <br>
 
-### FAQ
+## Missing
+
+Here are some of the things I'd like to happen but haven't figured out how to do yet.
+
+- **Cascading Overrides** If `/projects/alita/rez` is on the `REZ_PACKAGE_PATH`, then the contained `maya/package.py` should *add to* the studio-wide Maya configuration for this project. Similar to how CSS works.
+    - Could potentially be implemented by having every project require a stub `project_override` package, that per default does nothing, but can be implemented elsewhere and added to the `REZ_PACKAGES_PATH`.
+    - Another, less appealing way, is by "subclassing" a project e.g. `alita_override` of whichthe original `alita` package is a requirement along with additional requirements and environment variables. The downside of this is (a) you need one package for each permutation and (b) the user would need to stop typing `alita maya` and start typing `alita_override maya` which is error prone and tedious on both developer and user ends.
+
+<br>
+
+## FAQ
 
 #### Q: "Why Reference Packages?"
 
@@ -370,10 +620,53 @@ Other packages reference something on the local system instead.
 c:\program files\autodesk\maya2018\bin\maya.exe # content
 ```
 
-These are referred to as Reference Packages throughout this project.
-
 <br>
 
 #### Q: "Why store project scripts with Package?"
 
 I.e. why not store them with the project, and reference that?
+
+By keeping a Rez package self-contained:
+
+1. You enable versioning of project-specific payload
+1. You avoid package and payload from getting out of sync
+2. You enable re-use of a package
+
+Consider the following example.
+
+```
+packages/
+  alita/
+    package.py
+
+/
+  projects/
+    alita/
+      scripts/
+        maya/
+```
+
+```python
+# package.py
+def commands():
+    env["PYTHONPATH"] = "${PROJECT_PATH}/scripts/maya"
+```
+
+This package cannot exist without an externally set `PROJECT_PATH` environment variable. Without it, the environment cannot be entered, and yet the package can still exist on your `REZ_PACKAGES_PATH`, sending mixed messages about its availability.
+
+If instead scripts for Maya were contained within the package itself..
+
+```
+packages/
+  alita/
+    scripts/
+      maya/
+```
+
+```python
+# package.py
+def commands():
+    env["PYTHONPATH"] = "{root}/scripts/maya"
+```
+
+Then a package being available means payload being available too, and if you wanted to reuse this package in some other project, you could.
