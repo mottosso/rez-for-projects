@@ -21,6 +21,9 @@ set PATH=%~dp0..\bin;%PATH%
 
 set PROMPT=$$ 
 
+set GITLAB_API_KEY=abc123
+set FTRACK_API_KEY=abc123
+
 goto success
 
 :norez
