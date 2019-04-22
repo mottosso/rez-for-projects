@@ -4,66 +4,72 @@ name = "alita"
 version = "0.3.17"
 
 build_command = "python -m rezutils {root}"
+private_build_requires = ["rezutils-1"]
 
-private_build_requires = [
-    "rezutils-1",
-]
+_requires = {
+    "any": [
+        "base-1",
+        "python-2.7",
 
-build_requires = [
-    "base-1",
-    "python-2.7",
+        # Supported DCCs, if either of these are used,
+        # this must be their version.
+        "~maya-2018",
+        "~nuke-11",
+        "~houdinifx-17",
+        "~aftereffects-cs6",
+        "~photoshop-2018",
+    ],
 
-    # Supported DCCs, if either of these are used,
-    # this must be their version.
-    "~maya-2018",
-    "~nuke-11",
-    "~houdinifx-17",
-    "~aftereffects-cs6",
-    "~photoshop-2018",
-]
-
-# Shared requirements, used by all DCCs
-dcc_requires = [
-    "pyblish_base-1.4",
-]
-
-# DCC-specific requirements
-maya_requires = dcc_requires + [
-    "mgear-2.4",
-]
-
-nuke_requires = dcc_requires + []
-
-environ = {
-    "PROJECT_NAME": "Alita",
-    "PROJECT_PATH": "{env.PROJECTS_PATH}/alita",
-
-    # For locating in e.g. ftrack
-    "PRODUCTION_TRACKER_ID": "alita-123",
+    # Requirements relative a request
+    # E.g. if `alita maya` is requested, the "maya"
+    # requirements are added to the list.
+    "maya": [
+        "pyblish_base-1.4",
+        "mgear-2.4",
+    ],
+    "nuke": [
+        "pyblish_base-1.4",
+    ]
 }
 
-maya_environ = {
-    "MAYA_COLOR_MANAGEMENT_POLICY_FILE": [
-        "{root}/maya/color_management/default_synColorConfig.xml"
-    ],
+_environ = {
+    "any": {
+        "PROJECT_NAME": "Alita",
+        "PROJECT_PATH": "{env.PROJECTS_PATH}/alita",
 
-    "PYTHONPATH": [
-        "{root}/maya/scripts",
-        "{root}/maya/shelves",
-    ],
+        # For locating in e.g. ftrack
+        "PRODUCTION_TRACKER_ID": "alita-123",
+    },
 
-    "MAYA_PLUG_IN_PATH": [
-        "{root}/maya/plugins"
-    ],
+    # Global overrides for TDs and free-form scripts
+    # These lack version or write-access control, and
+    # are intended for quick hacks and experimentation
+    # by artists not familiar or involved with Rez
+    # or overall package distribution.
+    "maya": {
+        "MAYA_COLOR_MANAGEMENT_POLICY_FILE": [
+            "{env.PROJECT_PATH}/maya/color_management"
+            "/default_synColorConfig.xml"
+        ],
 
-    "MAYA_SCRIPT_PATH": [
-        "{root}/maya/scripts",
-    ],
+        "PYTHONPATH": [
+            "{env.PROJECT_PATH}/maya/scripts",
+            "{env.PROJECT_PATH}/maya/shelves",
+        ],
 
-    "MAYA_SHELF_PATH": "{root}/maya/shelves",
-    "XBMLANGPATH": [
-        "{root}/maya/shelves/icons"
-    ],
+        "MAYA_PLUG_IN_PATH": [
+            "{env.PROJECT_PATH}/maya/plugins"
+        ],
+
+        "MAYA_SCRIPT_PATH": [
+            "{env.PROJECT_PATH}/maya/scripts",
+        ],
+
+        "MAYA_SHELF_PATH": "{env.PROJECT_PATH}/maya/shelves",
+        "XBMLANGPATH": [
+            "{env.PROJECT_PATH}/maya/shelves/icons"
+        ],
+    }
 }
 
 
@@ -72,15 +78,19 @@ def requires():
     global this
     global request
     global in_context
-    requires = this.build_requires[:]
 
-    if in_context() and "maya" in request:
-        requires += this.maya_requires
+    requires = this._requires
+    result = requires["any"][:]
 
-    if in_context() and "nuke" in request:
-        requires += this.nuke_requires
+    # Add request-specific requirements
+    if in_context():
+        for name, reqs in requires.items():
+            if name not in request:
+                continue
 
-    return requires
+            result += reqs
+
+    return result
 
 
 def commands():
@@ -89,12 +99,18 @@ def commands():
     global request
     global expandvars
 
-    environ = this.environ
+    environ = this._environ
+    result = environ["any"].items()
 
-    if "maya" in request:
-        environ.update(this.maya_environ)
+    # Add request-specific environments
+    for key, values in environ.items():
+        if key not in request:
+            continue
 
-    for key, value in this.environ.items():
+        result += values.items()
+
+    print(result)
+    for key, value in result:
         if isinstance(value, (tuple, list)):
             [env[key].append(expandvars(v)) for v in value]
         else:

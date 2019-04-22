@@ -111,6 +111,36 @@ Every show is represented by a Project Package that encapsulates each unique req
 </details>
 
 <details>
+    <summary>Free-form Overrides</summary>
+    <table>
+        <tr>
+            <th align="left"><code>alita</code></th>
+        </tr>
+        <tr>
+            <td>
+
+Every project provides "free-form overrides" which are read/write directories of scripts, plug-ins and shelves etc. for DCCs like Maya. Any artist may add or share scripts this way and is a way for those not involved with Rez or Git to contribute and share code with co-workers.
+
+**alita/package.py**
+
+```python
+def commands():
+    if "maya" in request:
+        # Refers to location outside of package, that may or may not exist
+        env["PYTHONPATH"].prepend("{env.PROJECTPATH}/maya/scripts")
+        env["PYTHONPATH"].prepend("{env.PROJECTPATH}/maya/shelves")
+```
+
+This idea is mostly relevant to studios in the 1-100 size, where there aren't enough developers to justify a release-cycle for any minor change, and less suitable in the 100-1,000 range where reliability trumps speed.
+
+**A word of caution** A consequence of this feature is that you can never be sure that what works today, given a fixed set of project requirements and versions, will work tomorrow; as there is only ever 1 version of these globally accessible free-form overrides.
+
+</td>
+        </tr>
+    </table>
+</details>
+
+<details>
     <summary>Third-party services</summary>
     <table>
         <tr>
@@ -495,6 +525,7 @@ Below is the structure and layout of this repository.
 On either Windows or Unix, run the below.
 
 ```bash
+$ set PATH=<-- path/to/rez/Scripts/rez -->;%PATH%
 $ git clone https://github.com/mottosso/rez-for-projects.git
 $ cd rez-for-projects
 $ ./build_all
