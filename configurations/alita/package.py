@@ -3,8 +3,7 @@ late = locals()["late"]
 name = "alita"
 version = "0.3.17"
 
-build_command = "python -m rezutils {root}"
-private_build_requires = ["rezutils-1"]
+build_command = False
 
 _requires = {
     "any": [
@@ -109,7 +108,6 @@ def commands():
 
         result += values.items()
 
-    print(result)
     for key, value in result:
         if isinstance(value, (tuple, list)):
             [env[key].append(expandvars(v)) for v in value]

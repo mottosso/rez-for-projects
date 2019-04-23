@@ -4,9 +4,13 @@ requires = [
     "core_pipeline-2",
 ]
 
-build_command = False
+build_command = "python -m rezutils {root}"
+private_build_requires = ["rezutils-1"]
 
 environ = {
+
+    # General environment applicable to
+    # every version of Maya.
     "MAYA_DISABLE_CIP": "1",
     "MAYA_DISABLE_CER": "1",
     "MAYA_DISABLE_CLIC_IPM": "1",
@@ -19,6 +23,31 @@ environ = {
     "MAYA_DEBUG_SIGTERM_AS_SIGINT": "1",
     "MAYA_COLOR_MANAGEMENT_POLICY_LOCK": "1",
     "MAYA_RENDER_SETUP_INCLUDE_ALL_LIGHTS": "0",
+
+    # General scripts and shelves
+    "MAYA_COLOR_MANAGEMENT_POLICY_FILE": [
+        "{root}/maya/color_management"
+        "/default_synColorConfig.xml"
+    ],
+
+    "PYTHONPATH": [
+        "{root}/maya/scripts",
+        "{root}/maya/shelves",
+    ],
+
+    "MAYA_PLUG_IN_PATH": [
+        "{root}/maya/plugins"
+    ],
+
+    "MAYA_SCRIPT_PATH": [
+        "{root}/maya/scripts",
+    ],
+
+    "MAYA_SHELF_PATH": "{root}/maya/shelves",
+
+    "XBMLANGPATH": [
+        "{root}/maya/shelves/icons"
+    ],
 }
 
 
