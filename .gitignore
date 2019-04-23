@@ -4,3 +4,5 @@ __pycache__
 local_packages_path/**
 release_packages_path/**
 !.gitignore
+
+rez-internal-example
