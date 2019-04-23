@@ -9,6 +9,14 @@ import collections
 dirname = os.path.dirname(__file__)
 repodir = os.path.dirname(dirname)
 
+# Some packages are directly from pip
+pip = [
+    "Qt.py==1.1.0",
+    "pyblish-base==1.7.2",
+    "pyblish-lite==0.8.4",
+    "pyblish-qml==1.9.9",
+]
+
 # Some packages depend on other packages
 # having been built first.
 order = [
@@ -33,24 +41,30 @@ print("Auto-building..")
 print("")
 print("-" * 30)
 
-packagesdir = os.path.join(dirname, "packages")
-_, existing, _ = next(os.walk(packagesdir))  # just directories
+repos = (
+    "local_packages_path",
+    "release_packages_path",
+)
 
-if existing:
-    sys.stdout.write("Cleaning existing packages.. ")
+for repo in repos:
+    path = os.path.join(repodir, repo)
+    _, existing, _ = next(os.walk(path))  # just directories
 
-    for attempt in range(3):
-        try:
-            for package in existing:
-                shutil.rmtree(os.path.join(packagesdir, package))
-        except OSError:
-            print("Retrying..")
-            time.sleep(1)
-            continue
-        else:
-            break
+    if existing:
+        sys.stdout.write("Cleaning %s.. " % repo)
 
-    print("all clean")
+        for attempt in range(3):
+            try:
+                for package in existing:
+                    shutil.rmtree(os.path.join(path, package))
+            except OSError:
+                sys.stderr.write(" retrying..")
+                time.sleep(1)
+                continue
+            else:
+                break
+
+        print("done.")
 
 count = 0
 
@@ -99,19 +113,28 @@ print("Building..")
 for package in sorted_packages:
         print(" - {name}-{version}".format(**package))
 
-        try:
-            with open(os.devnull, "w") as devnull:
-                subprocess.check_call(
-                    "rez build --install",
-                    cwd=package["base"],
-                    shell=True,
-                    stdout=None if opts.verbose else devnull,
-                )
-
-        except subprocess.CalledProcessError:
-            raise
+        with open(os.devnull, "w") as devnull:
+            subprocess.check_call(
+                "rez build --install",
+                cwd=package["base"],
+                shell=True,
+                stdout=None if opts.verbose else devnull,
+            )
 
         count += 1
+
+print("Pip installing..")
+for package in pip:
+    print(" - %s" % package)
+    with open(os.devnull, "w") as devnull:
+        subprocess.check_call(
+            "rez pip --install --release %s" % package,
+            shell=True,
+            stdout=None if opts.verbose else devnull,
+            stderr=subprocess.STDOUT,
+        )
+
+    count += 1
 
 print("-" * 30)
 print("Auto-built %d packages for you" % count)
