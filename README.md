@@ -1,4 +1,4 @@
-### Rez for Projects
+![image](https://user-images.githubusercontent.com/2152766/56589571-6e0c7a00-65dd-11e9-8635-cf6c236718fd.png)
 
 An example and exploration of how and if [Rez](https://github.com/nerdvegas/rez) could be used to version both software and project configurations.
 
@@ -8,18 +8,18 @@ An example and exploration of how and if [Rez](https://github.com/nerdvegas/rez)
 
 **Table of contents**
 
+- [History](#previous-versions-of-this-repository)
 - [Prelude](#prelude)
   - [What is Rez](#what-is-rez)
   - [Warnings](#warnings)
   - [Motivation](#motivation)
 - [Features](#Features)
+- [Workflow](#workflow)
 - [How it works](#how-it-works)
-    - [Build versus Runtime Requirements](#build-versus-runtime-requirements)
 - [Requirement Network](#requirement-network)
 - [Conditional Requirements](#conditional-requirements)
 - [This Repository](#this-repository)
 - [Usage](#usage)
-- [Building](#building)
 - [Architecture](#architecture)
 - [Missing](#missing)
 - [FAQ](#faq)
@@ -32,21 +32,27 @@ An example and exploration of how and if [Rez](https://github.com/nerdvegas/rez)
 
 This repo is complex; I've saved prior working versions in simpler conditions that you can checkout, whereby the README details what is available and what is missing.
 
-| Version | Description
-|:-------:|:-----------
-| [**`1.0`**](../../releases/tag/1.0) | Initial working version
-| [**`1.1`**](../../releases/tag/1.1) | Conditional requirements with `@late` and `private_build_requires`
-
 ```bash
 $ git clone https://github.com/mottosso/rez-for-projects.git
 $ cd rez-for-projects
 $ git checkout 1.0
-$ ./build_all
 ```
 
+| Version | Description
+|:-------:|:-----------
+| [**`1.0`**](../../releases/tag/1.0) | Initial working version
+| [**`1.1`**](../../releases/tag/1.1) | Conditional requirements with `@late` and `private_build_requires`
+| [**`1.2`**](../../releases/tag/1.2) | Got rid of `rezbuild.py` dependency, in favor of `build_command`
+| [**`1.3`**](../../releases/tag/1.3) | Added Workflow section and refactored directory layout
+
+<br>
+<br>
+<br>
 <br>
 
 ## Prelude
+
+<img align="right" height=250 src=https://user-images.githubusercontent.com/2152766/56585426-b32cae00-65d5-11e9-995e-b3f9115004da.png>
 
 ##### What is Rez
 
@@ -57,22 +63,24 @@ Broadly speaking, Rez is used to optimise parallelism amongst humans in a collab
 
 These are some specific scenarios that Rez, in particular through this project, addresses.
 
-1. As a **DEVELOPER**, I would like to publish updates to my software, so that artists can use it
-1. As a **DEVELOPER**, I would like to preserve prior updates, so that I can rollback if necessary
-1. As a **DEVELOPER**, I would like to indicate which versions are stable, so that artists can choose between latest or safest
-1. As a **DEVELOPER**, I would like to indicate which package depends on which other package, so that I can ensure compatibility
-1. As a **DEVELOPER**, I would like to resolve an environment whereby all version requirements are fulfilled, so that I can develop tools that depend on it
-1. As a **DEVELOPER**, I would like to be able to work in parallel with another developer on the same project, so that neither of us have to wait for the other
-1. As an ARTIST, I want pipeline to get out of my way, so that I can focus on my work
-1. As an ARTIST, I want software to run fast, so that I can focus on my work
-1. As a **SUPERVISOR**, I want multiple developers able to work on a software project in parallel, so I can get the most bang for the buck
-1. As a **SUPERVISOR**, I would like to track who published what and when, so that I know who to ask about updates or issues
-1. As a **DEVELOPER**, I would like Git tags associated with software version numbers, so as to provide a single source of truth as to what is released and what is not
-1. As a **SUPERVISOR**, I would like to have my show locked off from pipeline updates, so that nothing new gets broken during a crunch
-1. As a **DEVELOPER**, I would like to add a comment to a published package, so as to communicate to others what the changes were and why
-1. As a **DEVELOPER**, I would like to release packages on a per-show basis, so that other shows are unaffected by potentially breaking changes
-1. As a **DEVELOPER**, I would like to group related packages on disk, so that they are more easily browsed through via e.g. Windows Explorer or Nautilus
-1. As a **TD**, I would like to share scripts with my colleagues without having to know Git or Rez, so that I can avoid a Phd in pipeline to share my work
+|   | As a.. | I want.. | So that..
+|:--|:-------|:---------|:-------
+| 1 | developer | to publish updates to my software | artists can use it
+| 2 | developer | to preserve prior updates | I can rollback if necessary
+| 3 | developer | to indicate which versions are stable | artists can choose between latest or safest
+| 4 | developer | to indicate which package depends on which other package | I can ensure compatibility
+| 5 | developer | to resolve an environment whereby all version requirements are fulfilled | I can develop tools that depend on it
+| 6 | developer | to be able to work in parallel with another developer on the same project | neither of us have to wait for the other
+| 7 | artist | pipeline to get out of my way | I can focus on my work
+| 8 | artist | software to run fast | I can focus on my work
+| 9 | supervisor | multiple developers able to work on a software project in parallel | I can get the most bang for the buck
+| 10 | supervisor | to track who published what and when | I know who to ask about updates or issues
+| 11 | developer | Git tags associated with software version numbers | there is a single source of truth as to what is released and what is not
+| 12 | supervisor | to have my show locked off from pipeline updates | nothing new gets broken during a crunch
+| 13 | developer | to add a comment to a published package | I can communicate to others what the changes were and why
+| 14 | developer | to release packages on a per-show basis | other shows are unaffected by potentially breaking changes
+| 15 | developer | to group related packages on disk | they are more easily browsed through via e.g. Windows Explorer or Nautilus
+| 16 | td | to share scripts with my colleagues without having to know Git or Rez | I can avoid a Phd in pipeline to share my work
 
 </details>
 
@@ -86,7 +94,8 @@ This repo is different. It (mis)uses Rez primarily for resolving *environments*,
 
 It's not all upside down however; a lot of packages do contain Python modules or compiled Maya plug-ins in which case build system muscles are flexed in full.
 
-##### Warnings
+<details>
+  <summary>Warnings</summary>
 
 The community explicitly points out that Rez is not well suited for this purpose.
 
@@ -96,7 +105,10 @@ The community explicitly points out that Rez is not well suited for this purpose
 
 But if someone told you "ice cream wasn't designed for chocolate lava cake", would you listen? :)
 
-##### Motivation
+</details>
+
+<details>
+  <summary>Motivation</summary>
 
 So why do it? Because:
 
@@ -107,12 +119,19 @@ So why do it? Because:
 
 So with all that out of the way, let's have a look at what's possible!
 
+</details>
+
+<br>
+<br>
+<br>
 <br>
 
-### Features
+<div align="center"><img height=250 src=https://user-images.githubusercontent.com/2152766/56585877-904ec980-65d6-11e9-84cd-3b689947889c.png></div>
+
+<h3 align="center">Features</h3>
 
 <details>
-    <summary>Studio-wide environment</summary>
+    <summary align="center">Studio-wide environment</summary>
     <table>
         <tr>
             <th align="left"><code>base</code></th>
@@ -128,7 +147,7 @@ A top-level package represents the studio itself; containing environment and req
 </details>
 
 <details>
-    <summary>Per-project environment</summary>
+    <summary align="center">Per-project environment</summary>
     <table>
         <tr>
             <th align="left"><code>alita</code></th>
@@ -144,7 +163,7 @@ Every show is represented by a Project Package that encapsulates each unique req
 </details>
 
 <details>
-    <summary>Free-form Overrides</summary>
+    <summary align="center">Free-form Overrides</summary>
     <table>
         <tr>
             <th align="left"><code>alita</code></th>
@@ -174,7 +193,7 @@ This idea is mostly relevant to studios in the 1-100 size, where there aren't en
 </details>
 
 <details>
-    <summary>Third-party services</summary>
+    <summary align="center">Third-party services</summary>
     <table>
         <tr>
             <th align="left"><code>ftrack</code></th>
@@ -208,7 +227,7 @@ Like `ftrack`, a package for a self-hosted GitLab instance is also included, pro
 </details>
 
 <details>
-    <summary>Per-package combination environment</summary>
+    <summary align="center">Per-package combination environment</summary>
     <table>
         <tr>
             <th align="left"><code>alita</code></th>
@@ -227,7 +246,7 @@ Some requirements only make sense in conjunction with two or more packages. For 
 </details>
 
 <details>
-    <summary>External and internal packages</summary>
+    <summary align="center">External and internal packages</summary>
     <table>
         <tr>
             <th align="left"><code>pip</code>, <code>core_pipeline</code></th>
@@ -250,7 +269,7 @@ $ rez pip --install Qt.py
 </details>
 
 <details>
-    <summary>Self-contained packages</summary>
+    <summary align="center">Self-contained packages</summary>
     <table>
         <tr>
             <th align="left"><code>core_pipeline</code></th>
@@ -267,7 +286,7 @@ Some packages in this project reference an external payload, like `maya`. Others
 </details>
 
 <details>
-    <summary>Reference packages</summary>
+    <summary align="center">Reference packages</summary>
     <table>
         <tr>
             <th align="left"><code>maya</code></th>
@@ -287,7 +306,7 @@ See [Reference Packages](#q-why-reference-packages) for more.
 
 
 <details>
-    <summary>Cross-platform application packages</summary>
+    <summary align="center">Cross-platform application packages</summary>
     <table>
         <tr>
             <th align="left"><code>maya</code></th>
@@ -304,7 +323,7 @@ The `maya` package looks the same on both Windows and Linux.
 </details>
 
 <details>
-    <summary>Multi-versioned application packages</summary>
+    <summary align="center">Multi-versioned application packages</summary>
     <table>
         <tr>
             <th align="left"><code>maya</code></th>
@@ -334,8 +353,149 @@ Which means `maya-2017` may be updated to `maya-2017.5` despite not being latest
 </details>
 
 <br>
+<br>
+<br>
+<br>
 
-### How it works
+<div align="center"><img src=https://user-images.githubusercontent.com/2152766/56584470-b161eb00-65d3-11e9-975e-17c266d2f8c4.png></div>
+
+<h3 align="center">Workflow</h3>
+
+The following documents how developer and artists interact with Rez and each other. Every release is accompanied by a mandatory develop stage. That is, no developer works directly towards the files accessible to Rez and the wider audience.
+
+- Every Rez package ends up in the `release_package_path/` directory, which is an example of where you host shared packaged within a single local area network.
+- Every Rez package is developed in 1 of 3 ways:
+  1. GitLab Tagging
+  2. `rez build --install --prefix`
+  3. `rez pip --install --release`
+
+<details>
+  <summary><b>1. Releasing via GitLab</b></summary>
+
+<table>
+<tr><td>
+
+In most cases, you'll be editing an internal project. In this example, we'll pretend `rez-internal-example` is an internal project at your company.
+
+</td></tr>
+<tr><td>
+
+**1.1 Prerequisites**
+
+1. Your studio uses self-hosted GitLab for version control and continuous integration
+1. Developer has access to GitLab web UI
+1. GitLab has write-access to your `REZ_RELEASE_PACKAGES_PATH`
+
+</td></tr>
+<tr><td>
+
+**1.2 Develop**
+
+Getting started on fixing a bug or implementing a feature involves an edit-and-install cycle.
+
+1. Clone `https://gitlab.com/mottosso/rez-internal-example.git`
+1. Edit `python/internal_example.py`
+1. Install `rez build --install`
+1. Repeat 2-3 until happy
+
+Whenever `--install` is called, the updated package can be found in the `local_packages_path` and is accessible to Rez during resolve.
+
+</td></tr>
+<tr><td>
+
+**1.3 Release**
+
+Once happy, you're ready to release.
+
+> Because this is read-only example, you can't actually run these steps yourself unless you (1) self-host GitLab and (2) fork this repository. But hopefully they can prove useful to get some sense of.
+
+1. Update `version` in `package.py` from `1.1.0` to `1.2.0`
+1. Add, commit and push changes
+1. Log in to GitLab and create a tag `1.2.0`
+1. Continuous Integration kicks in, triggering a release
+
+A [`.gitlab-ci.yml`](https://gitlab.com/mottosso/rez-internal-example/blob/master/.gitlab-ci.yml) example is provided in the source repo, though keep in mind it won't work as-is because `gitlab.com` doesn't have write-access to your local release path, but should at least hint towards how to do achieve the effect.
+
+</table>
+</details>
+
+<details>
+  <summary><b>2. Releasing without GitLab</b></summary>
+
+<table>
+<tr><td>
+
+The `rez-bundles` repository contains a number of packages that to Git is versioned together, but to Rez is released separately. This next section demonstrates how to release a package without using tags.
+
+</td></tr>
+<tr><td>
+
+**2.1 Develop**
+
+Developing works remains unchanged from the previous tutorial, except:
+
+1. Clone `https://github.com/mottosso/rez-bundles.git`
+2. Edit one of the packages, such as `alita`
+
+The package is available in your `REZ_LOCAL_PACKAGES_PATH`.
+
+</td></tr>
+<tr><td>
+
+**2.2 Release**
+
+Again, similar to the previous tutorial.
+
+1. Update `version` in `package.py` of the package you've edited
+2. Add, commit and push
+3. Call `rez build --install --prefix %REZ_RELEASE_PACKAGES_PATH%`
+
+> Replace `%` with `$` on Linux and MacOS
+
+The package is now available in your `REZ_RELEASE_PACKAGES_PATH`
+
+</td></tr>
+</table>
+</details>
+
+<details>
+  <summary><b>3. Releasing <code>pip</code> packages</b></summary>
+
+<table>
+<tr><td>
+
+**3.1 Develop**
+
+Install any package from `pip` using the `rez pip --install` command.
+
+```bash
+$ rez pip --install Qt.py
+```
+
+The package is available in your `REZ_LOCAL_PACKAGES_PATH`.
+
+**3.2 Release**
+
+Just append `--release`.
+
+```bash
+$ rez pip --install --release Qt.py
+```
+
+The package is now available in your `REZ_RELEASE_PACKAGES_PATH`
+
+</td></tr>
+</table>
+</details>
+
+<br>
+<br>
+<br>
+<br>
+
+<div align="center"><img src=https://user-images.githubusercontent.com/2152766/56585131-1ec24b80-65d5-11e9-8f6e-05ce7449925f.png></div>
+
+<h3 align="center">How it Works</h3>
 
 The project defines 3 types of Rez packages.
 
@@ -408,8 +568,14 @@ The project defines 3 types of Rez packages.
 </table>
 
 <br>
+<br>
+<br>
+<br>
+<br>
 
-### Requirement Network
+<div align="center"><img src=https://user-images.githubusercontent.com/2152766/56587717-e6713c00-65d9-11e9-967a-b2e741addab3.png></div>
+
+<h3 align="center">Requirement Network</h3>
 
 Here's and example of how one request is resolved.
 
@@ -506,8 +672,14 @@ def requires():
 ```
 
 <br>
+<br>
+<br>
+<br>
+<br>
 
-## This Repository
+<div align="center"><img src=https://user-images.githubusercontent.com/2152766/56588014-76af8100-65da-11e9-97df-55c7ff1ee460.png></div>
+
+<h3 align="center">This Repository</h3>
 
 This repository combines several aspects normally separate in an actual Rez-ified production environment. For example, the `dev/` directory is typically local to a developer's machine. The `local_packages_path/` is typically `~/packages`. And so forth. See the below table or README's contained in each sub-directory for details.
 
@@ -545,10 +717,14 @@ Internal mono-repo of projects and applications.
 | **`python/`**         | System reference to Python-2.7 and -3.6
 
 <br>
+<br>
+<br>
+<br>
+<br>
 
-## Usage
+<div align="center"><img src=https://user-images.githubusercontent.com/2152766/56588385-2258d100-65db-11e9-89f9-f1f0aafccf6a.png></div>
 
-![rez_running](https://user-images.githubusercontent.com/2152766/56455060-cf201d80-6351-11e9-93af-d6ae0721bb4e.gif)
+<h3 align="center">Usage</h3>
 
 **Prerequisites**
 
@@ -604,13 +780,7 @@ $
 
 The shell script configures Rez to look for packages in this repository, exposes aliases `re` and `ri` for common Rez commands and provides you with a greeting message. It does not implement any custom behavior, everything is native to Rez.
 
-<br>
-
-### Building
-
-Both software and configurations are plain Rez packages, and are installed with the `rez build --install` command, or `ri` for short.
-
-![rez_building](https://user-images.githubusercontent.com/2152766/56455059-ce878700-6351-11e9-98b7-8ee9c44b9a52.gif)
+<div align="center"><img src=https://user-images.githubusercontent.com/2152766/56455060-cf201d80-6351-11e9-93af-d6ae0721bb4e.gif></div>
 
 <br>
 
@@ -623,18 +793,6 @@ Both software and configurations are plain Rez packages, and are installed with 
 - `alita` and `lotr` are "configurations", in that they represent a project, rather than software
 - `alita` is associated to version 2018 of Maya, via a "weak reference"
 - Combinations of two or more packages result in a specific list of requirements and environment variables via the `@late` decorator.
-
-<br>
-
-#### Build versus Runtime Requirements
-
-Rez resolves requirements during build per default, because Rez is primarily designed to build software that depend on other software having been built first. It can also be made to resolve requirements when calling `rez env`, which I'll refer to as run-time requirements in this repo.
-
-All packages in this project are *run-time* requirements, unless:
-
-1. It is used by another package during build
-
-The only package where this exception currently applies is `rezutils`
 
 <br>
 
