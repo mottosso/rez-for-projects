@@ -17,7 +17,7 @@ set REZ_LOCAL_PACKAGES_PATH=%~dp0packages
 set REZ_PACKAGES_PATH=%~dp0packages
 
 :: Expose re, alias for rez env
-set PATH=%~dp0..\bin;%PATH%
+set PATH=%~dp0bin;%PATH%
 
 set PROMPT=$$ 
 

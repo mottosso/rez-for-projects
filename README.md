@@ -476,36 +476,40 @@ def requires():
 
 ## This Repository
 
-Below is the structure and layout of this repository.
+This repository combines several aspects normally separate in an actual Rez-ified production environment. For example, the `dev/` directory is typically local to a developer's machine. The `local_packages_path/` is typically `~/packages`. And so forth. See the below table or README's contained in each sub-directory for details.
 
 | Directory       | Description
 |:----------------|:----------
-| **`.packages/`**      | Search and install path for packages
-| **`bin/`**            | Convenience scripts for Windows, alias used on Linux
-| **`configurations/`** | The project configurations
-| **`python/`**         | Scripts available during package build
-| **`software/`**       | Standard Rez software packages
+| **`.rez/`**           | Private files to this repo
+| **`dev/`**            | Representation of a local development directory
+| **`local_packages_path/`** | Representation of the default `~/packages` directory
+| **`remote_packages_path/`**  | Representation of a shared location for released packages
 
-**`configurations/`**
+**`dev/`**
 
-| Directory       | Description
-|:----------------|:----------------
+Local development directory.
+
+| Directory            | Description
+|:---------------------|:----------------
+| **`core-pipeline/`** | Representation of an internal project, hosted on e.g. GitLab
+| **`maya-base/`**     |
+| **`mgear/`**         | Representation of an external project, hosted on [GitHub](https://github.com/mgear-dev)
+| **`pip/`**           | External project, temporarily hosted locally for release
+| **`rez-bundles/`**   | Internal project, containing all projects and applications
+
+**`dev/rez-bundles/`**
+
+Internal mono-repo of projects and applications.
+
+| Directory             | Description
+|:----------------------|:----------------
 | **`alita/`**          | DCC and software requirements, and environment for the Alita project
 | **`lotr/`**           | Likewise, but for Lord of the Rings
-
-**`software/`**
-
-| Directory       | Description
-|:----------------|:----------------
 | **`base/`**           | Common studio environment
 | **`maya_base/`**      | Common studio environment for Maya
 | **`maya/`**           | System reference to Maya-2017-2019
 | **`nuke/`**           | System reference to Nuke-11v3.2
 | **`python/`**         | System reference to Python-2.7 and -3.6
-| **`core_pipeline/`**  | Internal project from local GitLab
-| **`mgear/`**          | Internal project from local GitLab
-| **`pyblish_base/`**   | External package from pip
-| **`pip/`**            | Self-contained version of pip-19
 
 <br>
 
@@ -524,9 +528,11 @@ Below is the structure and layout of this repository.
 
 On either Windows or Unix, run the below.
 
+> Don't forget about **`--recursive`**, due to the `rez-bundles` submodule.
+
 ```bash
 $ set PATH=<-- path/to/rez/Scripts/rez -->;%PATH%
-$ git clone https://github.com/mottosso/rez-for-projects.git
+$ git clone --recursive https://github.com/mottosso/rez-for-projects.git
 $ cd rez-for-projects
 $ ./build_all
 ```
