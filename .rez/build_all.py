@@ -32,7 +32,7 @@ print("Auto-building..")
 print("")
 print("-" * 30)
 
-packagesdir = os.path.join(repodir, ".packages")
+packagesdir = os.path.join(dirname, "packages")
 _, existing, _ = next(os.walk(packagesdir))  # just directories
 
 if existing:

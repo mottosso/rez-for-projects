@@ -1,5 +1,5 @@
 build
 *.pyc
 __pycache__
-.packages/**
-!.packages/.gitignore
+.rez/packages/**
+!.gitignore

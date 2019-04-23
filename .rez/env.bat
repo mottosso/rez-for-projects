@@ -11,10 +11,10 @@ IF ERRORLEVEL 1 (
 )
 
 :: Install packages here
-set REZ_LOCAL_PACKAGES_PATH=%~dp0..\.packages
+set REZ_LOCAL_PACKAGES_PATH=%~dp0packages
 
 :: Look for packages here
-set REZ_PACKAGES_PATH=%~dp0..\.packages
+set REZ_PACKAGES_PATH=%~dp0packages
 
 :: Expose re, alias for rez env
 set PATH=%~dp0..\bin;%PATH%
