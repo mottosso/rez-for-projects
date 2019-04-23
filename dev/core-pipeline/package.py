@@ -6,9 +6,8 @@ environ = {
     ],
 }
 
-private_build_requires = [
-    "rezutils-1",
-]
+build_command = "python -m rezutils {root}"
+private_build_requires = ["rezutils-1"]
 
 
 def commands():
