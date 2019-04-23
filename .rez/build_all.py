@@ -4,6 +4,7 @@ import time
 import shutil
 import argparse
 import subprocess
+import collections
 
 dirname = os.path.dirname(__file__)
 repodir = os.path.dirname(dirname)
@@ -53,56 +54,64 @@ if existing:
 
 count = 0
 
-print("Building packages..")
-for root in ("software", "configurations"):
-    root = os.path.join(repodir, root)
+print("Scanning..")
+root = os.path.join(repodir, "dev")
+packages = collections.defaultdict(list)
+for base, dirs, files in os.walk(root):
 
-    for base, dirs, files in os.walk(root):
+    for fname in files:
+        if fname != "package.py":
+            continue
 
-        # Order relevant packages by above criteria
-        for index, name in enumerate(order):
-            if name in dirs[:]:
-                dirs.remove(name)
-                dirs.insert(index, name)
+        dirs[:] = []  # Stop traversing
+        abspath = os.path.join(base, fname)
 
-        for fname in files:
-            if fname != "package.py":
-                continue
+        with open(abspath) as f:
+            for line in f:
+                if line.startswith("name"):
+                    name = line.split(" = ")[-1]
+                    name = name.rstrip()  # newline
+                    name = name.replace("\"", "")  # quotes
+                if line.startswith("version"):
+                    version = line.split(" = ")[-1]
+                    version = version.rstrip()  # newline
+                    version = version.replace("\"", "")  # quotes
 
-            dirs[:] = []  # Stop traversing
-            abspath = os.path.join(base, fname)
+        packages[name] += [{
+            "name": name,
+            "base": base,
+            "version": version,
+            "abspath": abspath,
+        }]
 
-            name = "unknown"
-            version = "0.0.0"
+# Order relevant packages by above criteria
+print("Sorting..")
+sorted_packages = []
+for name in order:
+    sorted_packages += packages.pop(name)
 
-            with open(abspath) as f:
-                for line in f:
-                    if line.startswith("name"):
-                        name = line.split(" = ")[-1]
-                        name = name.rstrip()  # newline
-                        name = name.replace("\"", "")  # quotes
-                    if line.startswith("version"):
-                        version = line.split(" = ")[-1]
-                        version = version.rstrip()  # newline
-                        version = version.replace("\"", "")  # quotes
+# Add remainder
+for _, package in packages.items():
+    sorted_packages += package
 
-            print(" - %s-%s" % (name, version))
 
-            exe = sys.executable
+print("Building..")
+for package in sorted_packages:
+        print(" - {name}-{version}".format(**package))
 
-            try:
-                with open(os.devnull, "w") as devnull:
-                    subprocess.check_call(
-                        "rez build --install",
-                        cwd=base,
-                        shell=True,
-                        stdout=None if opts.verbose else devnull,
-                    )
+        try:
+            with open(os.devnull, "w") as devnull:
+                subprocess.check_call(
+                    "rez build --install",
+                    cwd=package["base"],
+                    shell=True,
+                    stdout=None if opts.verbose else devnull,
+                )
 
-            except subprocess.CalledProcessError:
-                raise
+        except subprocess.CalledProcessError:
+            raise
 
-            count += 1
+        count += 1
 
 print("-" * 30)
 print("Auto-built %d packages for you" % count)

@@ -9,6 +9,9 @@ An example and exploration of how and if [Rez](https://github.com/nerdvegas/rez)
 **Table of contents**
 
 - [Prelude](#prelude)
+  - [What is Rez](#what-is-rez)
+  - [Warnings](#warnings)
+  - [Motivation](#motivation)
 - [Features](#Features)
 - [How it works](#how-it-works)
     - [Build versus Runtime Requirements](#build-versus-runtime-requirements)
@@ -43,7 +46,37 @@ $ ./build_all
 
 <br>
 
-### Prelude
+## Prelude
+
+##### What is Rez
+
+Broadly speaking, Rez is used to optimise parallelism amongst humans in a collaborative endeavors, especially those in visual effects. Every human added to a project comes with some amount of overhead to tooling and communication. At a certain scale - beyond 10-50 humans - that overhead needs management and that's where Rez comes in.
+
+<details>
+  <summary>User Stories</summary>
+
+These are some specific scenarios that Rez, in particular through this project, addresses.
+
+1. As a **DEVELOPER**, I would like to publish updates to my software, so that artists can use it
+1. As a **DEVELOPER**, I would like to preserve prior updates, so that I can rollback if necessary
+1. As a **DEVELOPER**, I would like to indicate which versions are stable, so that artists can choose between latest or safest
+1. As a **DEVELOPER**, I would like to indicate which package depends on which other package, so that I can ensure compatibility
+1. As a **DEVELOPER**, I would like to resolve an environment whereby all version requirements are fulfilled, so that I can develop tools that depend on it
+1. As a **DEVELOPER**, I would like to be able to work in parallel with another developer on the same project, so that neither of us have to wait for the other
+1. As an ARTIST, I want pipeline to get out of my way, so that I can focus on my work
+1. As an ARTIST, I want software to run fast, so that I can focus on my work
+1. As a **SUPERVISOR**, I want multiple developers able to work on a software project in parallel, so I can get the most bang for the buck
+1. As a **SUPERVISOR**, I would like to track who published what and when, so that I know who to ask about updates or issues
+1. As a **DEVELOPER**, I would like Git tags associated with software version numbers, so as to provide a single source of truth as to what is released and what is not
+1. As a **SUPERVISOR**, I would like to have my show locked off from pipeline updates, so that nothing new gets broken during a crunch
+1. As a **DEVELOPER**, I would like to add a comment to a published package, so as to communicate to others what the changes were and why
+1. As a **DEVELOPER**, I would like to release packages on a per-show basis, so that other shows are unaffected by potentially breaking changes
+1. As a **DEVELOPER**, I would like to group related packages on disk, so that they are more easily browsed through via e.g. Windows Explorer or Nautilus
+1. As a **TD**, I would like to share scripts with my colleagues without having to know Git or Rez, so that I can avoid a Phd in pipeline to share my work
+
+</details>
+
+<br>
 
 > This repo assumes an experienced-level of familiarity with [Rez](https://github.com/nerdvegas/rez).
 
@@ -53,7 +86,7 @@ This repo is different. It (mis)uses Rez primarily for resolving *environments*,
 
 It's not all upside down however; a lot of packages do contain Python modules or compiled Maya plug-ins in which case build system muscles are flexed in full.
 
-**Warnings**
+##### Warnings
 
 The community explicitly points out that Rez is not well suited for this purpose.
 
@@ -63,7 +96,7 @@ The community explicitly points out that Rez is not well suited for this purpose
 
 But if someone told you "ice cream wasn't designed for chocolate lava cake", would you listen? :)
 
-**Motivation**
+##### Motivation
 
 So why do it? Because:
 

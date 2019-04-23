@@ -11,13 +11,15 @@ IF ERRORLEVEL 1 (
 )
 
 :: Install packages here
-set REZ_LOCAL_PACKAGES_PATH=%~dp0packages
+set REZ_LOCAL_PACKAGES_PATH=%~dp0..\local_packages_path
+set REZ_RELEASE_PACKAGES_PATH=%~dp0..\release_packages_path
 
 :: Look for packages here
-set REZ_PACKAGES_PATH=%~dp0packages
+set REZ_PACKAGES_PATH=%REZ_RELEASE_PACKAGES_PATH%;%REZ_LOCAL_PACKAGES_PATH%
 
-:: Expose re, alias for rez env
-set PATH=%~dp0bin;%PATH%
+:: "Aliases"
+doskey re=rez env $*
+doskey ri=rez build --install $*
 
 set PROMPT=$$ 
 

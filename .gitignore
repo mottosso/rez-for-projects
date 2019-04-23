@@ -1,5 +1,6 @@
 build
 *.pyc
 __pycache__
-.rez/packages/**
+local_packages_path/**
+release_packages_path/**
 !.gitignore
