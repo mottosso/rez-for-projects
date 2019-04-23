@@ -68,7 +68,7 @@ for repo in repos:
 
 count = 0
 
-print("Scanning..")
+sys.stdout.write("Scanning.. ")
 root = os.path.join(repodir, "dev")
 packages = collections.defaultdict(list)
 for base, dirs, files in os.walk(root):
@@ -97,9 +97,10 @@ for base, dirs, files in os.walk(root):
             "version": version,
             "abspath": abspath,
         }]
+print("ok")
 
 # Order relevant packages by above criteria
-print("Sorting..")
+sys.stdout.write("Sorting.. ")
 sorted_packages = []
 for name in order:
     sorted_packages += packages.pop(name)
@@ -107,9 +108,9 @@ for name in order:
 # Add remainder
 for _, package in packages.items():
     sorted_packages += package
+print("ok")
 
-
-print("Building..")
+sys.stdout.write("Building.. ")
 for package in sorted_packages:
         print(" - {name}-{version}".format(**package))
 
@@ -122,8 +123,9 @@ for package in sorted_packages:
             )
 
         count += 1
+print("ok")
 
-print("Pip installing..")
+sys.stdout.write("Pip installing..")
 for package in pip:
     print(" - %s" % package)
     with open(os.devnull, "w") as devnull:
@@ -135,6 +137,7 @@ for package in pip:
         )
 
     count += 1
+print("ok")
 
 print("-" * 30)
 print("Auto-built %d packages for you" % count)
