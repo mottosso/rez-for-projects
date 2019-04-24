@@ -56,7 +56,7 @@ $ git checkout 1.0
 
 ##### What is Rez
 
-Broadly speaking, Rez is used to optimise parallelism amongst humans in a collaborative endeavors, especially those in visual effects. Every human added to a project comes with some amount of overhead to tooling and communication. At a certain scale - beyond 10-50 humans - that overhead needs management and that's where Rez comes in.
+Broadly speaking, Rez is used to optimise parallelism amongst humans in a collaborative endeavors, especially those in visual effects. Every human added to a project comes with some amount of overhead to tooling and communication. At a certain scale - beyond 10-50 humans - that overhead needs management and that's where Rez fits in; it can help increase parallelism between one human having a software issue and another addressing it, with minimal impact on the remaining 48 humans.
 
 <details>
   <summary>User Stories</summary>
@@ -363,11 +363,27 @@ Which means `maya-2017` may be updated to `maya-2017.5` despite not being latest
 
 The following documents how developer and artists interact with Rez and each other. Every release is accompanied by a mandatory develop stage. That is, no developer works directly towards the files accessible to Rez and the wider audience.
 
-- Every Rez package ends up in the `release_package_path/` directory, which is an example of where you host shared packaged within a single local area network.
+<table>
+  <tr>
+    <th>Develop</th>
+    <th>Release</th>
+  </tr>
+  <tr>
+<td>
+
+Every Rez package ends up in the `release_package_path/` directory, which is an example of where you host shared packaged within a single local area network.
+
+</td>
+<td>
+
 - Every Rez package is developed in 1 of 3 ways:
   1. GitLab Tagging
   2. `rez build --install --prefix`
   3. `rez pip --install --release`
+
+</td>
+</tr>
+</table>
 
 <details>
   <summary><b>1. Releasing via GitLab</b></summary>
@@ -734,6 +750,31 @@ Internal mono-repo of projects and applications.
 1. `rez` available on PATH
 
 **Install**
+
+<details>
+  <summary>Install Rez</summary>
+
+<table>
+  <tr>
+    <td>
+      
+Unless you've already got it setup, here's what you do.
+
+```bash
+$ git clone https://github.com/mottosso/bleeding-rez.git Rez/git
+$ cd Rez
+$ python git/install.py -v .
+$ set PATH=%cd%\Scripts;%PATH%  # Windows
+$ export PATH=$(pwd)\Scripts:$PATH  # Linux
+$ # Good to go
+```
+
+</td>
+</tr>
+</table>
+
+</details>
+<br>
 
 On either Windows or Unix, run the below.
 
