@@ -15,13 +15,13 @@ set REZ_LOCAL_PACKAGES_PATH=%~dp0..\local_packages_path
 set REZ_RELEASE_PACKAGES_PATH=%~dp0..\release_packages_path
 
 :: Look for packages here
-set REZ_PACKAGES_PATH=%REZ_RELEASE_PACKAGES_PATH%;%REZ_LOCAL_PACKAGES_PATH%
+set REZ_PACKAGES_PATH=%REZ_PACKAGES_PATH%;%REZ_RELEASE_PACKAGES_PATH%;%REZ_LOCAL_PACKAGES_PATH%
 
 :: "Aliases"
 doskey re=rez env $*
 doskey ri=rez build --install $*
 
-set PROMPT=$$ 
+set PROMPT=(rez) $$ 
 
 set GITLAB_API_KEY=abc123
 set FTRACK_API_KEY=abc123
