@@ -110,7 +110,7 @@ for _, package in packages.items():
     sorted_packages += package
 print("ok")
 
-sys.stdout.write("Building.. ")
+print("Building.. ")
 for package in sorted_packages:
         print(" - {name}-{version}".format(**package))
 
@@ -123,9 +123,8 @@ for package in sorted_packages:
             )
 
         count += 1
-print("ok")
 
-sys.stdout.write("Pip installing..")
+print("Pip installing..")
 for package in pip:
     print(" - %s" % package)
     with open(os.devnull, "w") as devnull:

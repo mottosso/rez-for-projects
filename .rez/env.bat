@@ -33,13 +33,11 @@ goto success
     echo Rez was not found on your PATH :(
     echo ---------------------------------
     pause
-    exit 1
 
 :nopython
     echo ---------------------------------
     echo Python was not found on your PATH :(
     echo ---------------------------------
     pause
-    exit 1
 
 :success
