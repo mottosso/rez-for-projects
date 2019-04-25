@@ -365,9 +365,10 @@ The following documents how developer and artists interact with Rez and each oth
 
 <table>
   <tr>
-    <th>Develop</th>
+    <th width="50%">Develop</th>
     <th>Release</th>
   </tr>
+  <tr></tr>
   <tr>
 <td>
 
