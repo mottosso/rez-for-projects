@@ -14,12 +14,15 @@ An example and exploration of how and if [Rez](https://github.com/nerdvegas/rez)
   - [Warnings](#warnings)
   - [Motivation](#motivation)
 - [Features](#Features)
-- [Workflow](#workflow)
 - [How it works](#how-it-works)
 - [Requirement Network](#requirement-network)
 - [Conditional Requirements](#conditional-requirements)
 - [This Repository](#this-repository)
 - [Usage](#usage)
+    - [Install](#install)
+    - [Workflow](#workflow)
+    - [Development](#development)
+    - [Terminal](#terminal)
 - [Architecture](#architecture)
 - [Missing](#missing)
 - [FAQ](#faq)
@@ -752,22 +755,40 @@ Internal mono-repo of projects and applications.
 
 **Install**
 
+If you haven't got Rez installed, start here:
+
 <details>
-  <summary>Install Rez</summary>
+  <summary>Install Rez on Windows</summary>
 
 <table>
   <tr>
     <td>
-      
-Unless you've already got it setup, here's what you do.
 
 ```bash
-$ git clone https://github.com/mottosso/bleeding-rez.git Rez/git
-$ cd Rez
-$ python git/install.py -v .
-$ set PATH=%cd%\Scripts;%PATH%  # Windows
-$ export PATH=$(pwd)\Scripts:$PATH  # Linux
-$ # Good to go
+git clone https://github.com/mottosso/bleeding-rez.git Rez/git
+cd Rez
+c:\python27\python.exe git/install.py -v .
+set PATH=%cd%\Scripts;%PATH%
+```
+
+</td>
+</tr>
+</table>
+
+</details>
+
+<details>
+  <summary>Install Rez on Linux</summary>
+
+<table>
+  <tr>
+    <td>
+
+```bash
+git clone https://github.com/mottosso/bleeding-rez.git Rez/git
+cd Rez
+python git/install.py -v .
+export PATH=%cd%\Scripts;%PATH%
 ```
 
 </td>
@@ -823,6 +844,18 @@ $
 The shell script configures Rez to look for packages in this repository, exposes aliases `re` and `ri` for common Rez commands and provides you with a greeting message. It does not implement any custom behavior, everything is native to Rez.
 
 <div align="center"><img src=https://user-images.githubusercontent.com/2152766/56455060-cf201d80-6351-11e9-93af-d6ae0721bb4e.gif></div>
+
+<br>
+
+### Terminal
+
+Rez works on Windows and Linux (and probably OSX), but on Windows the integration with `cmd.exe` and `powershell` has one critical flaw: no history. Which means that hitting that up-arrow doesn't get you a previous command, instead it does nothing. It also lacks the color Linux users enjoy.
+
+Until that has been addressed, here are some options that solve this problem.
+
+- [ConEmu](https://conemu.github.io/)
+- [cmder](https://cmder.net/)
+- [Alacritty](https://github.com/jwilm/alacritty)
 
 <br>
 
