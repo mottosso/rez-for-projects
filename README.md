@@ -757,45 +757,10 @@ Internal mono-repo of projects and applications.
 
 If you haven't got Rez installed, start here:
 
-<details>
-  <summary>Install Rez on Windows</summary>
-
-<table>
-  <tr>
-    <td>
-
 ```bash
-git clone https://github.com/mottosso/bleeding-rez.git Rez/git
-cd Rez
-c:\python27\python.exe git/install.py -v .
-set PATH=%cd%\Scripts;%PATH%
+pip install bleeding-rez -U
 ```
 
-</td>
-</tr>
-</table>
-
-</details>
-
-<details>
-  <summary>Install Rez on Linux</summary>
-
-<table>
-  <tr>
-    <td>
-
-```bash
-git clone https://github.com/mottosso/bleeding-rez.git Rez/git
-cd Rez
-python git/install.py -v .
-export PATH=%cd%\Scripts;%PATH%
-```
-
-</td>
-</tr>
-</table>
-
-</details>
 <br>
 
 On either Windows or Unix, run the below.
