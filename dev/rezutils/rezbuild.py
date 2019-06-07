@@ -1,25 +1,9 @@
 import os
-import shutil
+import sys
 
+packagepy = os.getenv("REZ_BUILD_SOURCE_PATH")
+pythonpath = os.path.join(packagepy, "python")
+sys.path.insert(0, pythonpath)
 
-def build(source_path, build_path, install_path, targets):
-    src = os.path.join(source_path, "python", "rezutils.py")
-    dst = os.path.join(build_path, "python", "rezutils.py")
-
-    try:
-        os.makedirs(os.path.dirname(dst))
-    except OSError:
-        pass
-
-    shutil.copyfile(src, dst)
-
-    if "install" in targets:
-        src = os.path.join(build_path, "python", "rezutils.py")
-        dst = os.path.join(install_path, "python", "rezutils.py")
-
-        try:
-            os.makedirs(os.path.dirname(dst))
-        except OSError:
-            pass
-
-        shutil.copyfile(src, dst)
+from rezutils import _rezbuild
+build = _rezbuild.build
