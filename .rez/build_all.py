@@ -17,11 +17,16 @@ pip = [
     "pyblish-qml==1.9.9",
 ]
 
+scoop = [
+    "python",
+]
+
 # Some packages depend on other packages
 # having been built first.
 order = [
-    "python",
+    "scoopz",
     "rezutils",
+    "welcome",
     "ftrack",
     "gitlab",
     "base",
@@ -110,19 +115,48 @@ for _, package in packages.items():
     sorted_packages += package
 print("ok")
 
+print("Building scoop.. ")
+scoopz = next(pkg for pkg in sorted_packages if pkg["name"] == "scoopz")
+sorted_packages.remove(scoopz)
+with open(os.devnull, "w") as devnull:
+    subprocess.check_call(
+        "rez build --install",
+        cwd=scoopz["base"],
+        shell=True,
+        stdout=None if opts.verbose else devnull,
+        universal_newlines=True,
+    )
+
+count += 1
+
+print("Scoop installing..")
+for package in scoop:
+    print(" - %s" % package)
+    with open(os.devnull, "w") as devnull:
+        subprocess.check_call(
+            "rez env scoopz -- install %s -y" % package,
+            shell=True,
+            stdout=None if opts.verbose else devnull,
+            stderr=subprocess.STDOUT,
+            universal_newlines=True,
+        )
+
+    count += 1
+
 print("Building.. ")
 for package in sorted_packages:
-        print(" - {name}-{version}".format(**package))
+    print(" - {name}-{version}".format(**package))
 
-        with open(os.devnull, "w") as devnull:
-            subprocess.check_call(
-                "rez build --install",
-                cwd=package["base"],
-                shell=True,
-                stdout=None if opts.verbose else devnull,
-            )
+    with open(os.devnull, "w") as devnull:
+        subprocess.check_call(
+            "rez build --install",
+            cwd=package["base"],
+            shell=True,
+            stdout=None if opts.verbose else devnull,
+            universal_newlines=True,
+        )
 
-        count += 1
+    count += 1
 
 print("Pip installing..")
 for package in pip:
@@ -133,6 +167,7 @@ for package in pip:
             shell=True,
             stdout=None if opts.verbose else devnull,
             stderr=subprocess.STDOUT,
+            universal_newlines=True,
         )
 
     count += 1
