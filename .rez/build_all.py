@@ -3,6 +3,7 @@ import sys
 import time
 import shutil
 import argparse
+import contextlib
 import subprocess
 import collections
 
@@ -36,9 +37,62 @@ order = [
     "pip",
 ]
 
+
 parser = argparse.ArgumentParser()
 parser.add_argument("--verbose", action="store_true")
 opts = parser.parse_args()
+
+
+def call(command, **kwargs):
+    popen = subprocess.Popen(
+        command,
+        shell=True,
+        universal_newlines=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        **kwargs
+    )
+
+    output = list()
+    for line in iter(popen.stdout.readline, ""):
+        output += [line.rstrip()]
+
+        if opts.verbose:
+            sys.stdout.write(line)
+
+    popen.wait()
+
+    if popen.returncode != 0:
+        raise OSError(
+            # arg1, arg2 -------
+            # Some error here
+            # ------------------
+            "\n".join([
+                "%s ".ljust(70, "-") % ", ".join(command),
+                "",
+                "\n".join(output),
+                "",
+                "-" * 70,
+            ])
+        )
+
+
+@contextlib.contextmanager
+def stage(msg, timing=True):
+    sys.stdout.write(msg)
+    t0 = time.time()
+
+    try:
+        yield
+    except Exception:
+        print("fail")
+        raise
+    else:
+        if timing:
+            print("ok - %.2fs" % (time.time() - t0))
+        else:
+            print("ok")
+
 
 print("-" * 30)
 print("")
@@ -56,122 +110,83 @@ for repo in repos:
     _, existing, _ = next(os.walk(path))  # just directories
 
     if existing:
-        sys.stdout.write("Cleaning %s.. " % repo)
-
-        for attempt in range(3):
-            try:
-                for package in existing:
-                    shutil.rmtree(os.path.join(path, package))
-            except OSError:
-                sys.stderr.write(" retrying..")
-                time.sleep(1)
-                continue
-            else:
-                break
-
-        print("done.")
+        with stage("Cleaning %s.. " % repo):
+            for attempt in range(3):
+                try:
+                    for package in existing:
+                        shutil.rmtree(os.path.join(path, package))
+                except OSError:
+                    sys.stderr.write(" retrying..")
+                    time.sleep(1)
+                    continue
+                else:
+                    break
 
 count = 0
 
-sys.stdout.write("Scanning.. ")
-root = os.path.join(repodir, "dev")
-packages = collections.defaultdict(list)
-for base, dirs, files in os.walk(root):
+with stage("Scanning.. "):
+    root = os.path.join(repodir, "dev")
+    packages = collections.defaultdict(list)
+    for base, dirs, files in os.walk(root):
 
-    for fname in files:
-        if fname != "package.py":
-            continue
+        for fname in files:
+            if fname != "package.py":
+                continue
 
-        dirs[:] = []  # Stop traversing
-        abspath = os.path.join(base, fname)
+            dirs[:] = []  # Stop traversing
+            abspath = os.path.join(base, fname)
 
-        with open(abspath) as f:
-            for line in f:
-                if line.startswith("name"):
-                    name = line.split(" = ")[-1]
-                    name = name.rstrip()  # newline
-                    name = name.replace("\"", "")  # quotes
-                if line.startswith("version"):
-                    version = line.split(" = ")[-1]
-                    version = version.rstrip()  # newline
-                    version = version.replace("\"", "")  # quotes
+            with open(abspath) as f:
+                for line in f:
+                    if line.startswith("name"):
+                        name = line.split(" = ")[-1]
+                        name = name.rstrip()  # newline
+                        name = name.replace("\"", "")  # quotes
+                    if line.startswith("version"):
+                        version = line.split(" = ")[-1]
+                        version = version.rstrip()  # newline
+                        version = version.replace("\"", "")  # quotes
 
-        packages[name] += [{
-            "name": name,
-            "base": base,
-            "version": version,
-            "abspath": abspath,
-        }]
-print("ok")
+            packages[name] += [{
+                "name": name,
+                "base": base,
+                "version": version,
+                "abspath": abspath,
+            }]
 
 # Order relevant packages by above criteria
-sys.stdout.write("Sorting.. ")
-sorted_packages = []
-for name in order:
-    sorted_packages += packages.pop(name)
+with stage("Sorting.. "):
+    sorted_packages = []
+    for name in order:
+        sorted_packages += packages.pop(name)
 
-# Add remainder
-for _, package in packages.items():
-    sorted_packages += package
-print("ok")
+    # Add remainder
+    for _, package in packages.items():
+        sorted_packages += package
 
-print("Building scoop.. ")
-scoopz = next(pkg for pkg in sorted_packages if pkg["name"] == "scoopz")
-sorted_packages.remove(scoopz)
-with open(os.devnull, "w") as devnull:
-    subprocess.check_call(
-        "rez build --install",
-        cwd=scoopz["base"],
-        shell=True,
-        stdout=None if opts.verbose else devnull,
-        universal_newlines=True,
-    )
-
-count += 1
-
-print("Scoop installing..")
-for package in scoop:
-    print(" - %s" % package)
-    with open(os.devnull, "w") as devnull:
-        subprocess.check_call(
-            "rez env scoopz -- install %s -y" % package,
-            shell=True,
-            stdout=None if opts.verbose else devnull,
-            stderr=subprocess.STDOUT,
-            universal_newlines=True,
-        )
-
+with stage("Building scoop.. "):
+    scoopz = next(pkg for pkg in sorted_packages if pkg["name"] == "scoopz")
+    sorted_packages.remove(scoopz)
+    call("rez build --clean --install", cwd=scoopz["base"])
     count += 1
 
-print("Building.. ")
-for package in sorted_packages:
-    print(" - {name}-{version}".format(**package))
+with stage("Scoop installing.. "):
+    for package in scoop:
+        print(" - %s" % package)
+        call("rez env scoopz -- install %s -y" % package)
+        count += 1
 
-    with open(os.devnull, "w") as devnull:
-        subprocess.check_call(
-            "rez build --install",
-            cwd=package["base"],
-            shell=True,
-            stdout=None if opts.verbose else devnull,
-            universal_newlines=True,
-        )
+with stage("Building.. "):
+    for package in sorted_packages:
+        print(" - {name}-{version}".format(**package))
+        call("rez build --clean --install", cwd=package["base"])
+        count += 1
 
-    count += 1
-
-print("Pip installing..")
-for package in pip:
-    print(" - %s" % package)
-    with open(os.devnull, "w") as devnull:
-        subprocess.check_call(
-            "rez pip --install --release %s" % package,
-            shell=True,
-            stdout=None if opts.verbose else devnull,
-            stderr=subprocess.STDOUT,
-            universal_newlines=True,
-        )
-
-    count += 1
-print("ok")
+with stage("Pip installing.."):
+    for package in pip:
+        print(" - %s" % package)
+        call("rez pip --install --release %s" % package)
+        count += 1
 
 print("-" * 30)
 print("Auto-built %d packages for you" % count)
