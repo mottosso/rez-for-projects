@@ -83,6 +83,7 @@ On either Windows or Unix, run the below.
 $ set PATH=<-- path/to/rez/Scripts/rez -->;%PATH%
 $ git clone --recursive https://github.com/mottosso/rez-for-projects.git
 $ cd rez-for-projects
+$ git checkout 1.3
 $ ./build_all
 ```
 
@@ -826,6 +827,8 @@ Until that has been addressed, here are some options that solve this problem.
 
 ### Architecture
 
+- `_special = "value"` The `package.py` file format has a number of globals and reserved keywords outside of standard Python. Anything in addition to that, such as our `_environ` and `_data` are prefixed with `_` to distinguish what is ours and what is Rez's.
+- `_category = "int"` Every package must have a "category". The Category is a sub-directory within the `REZ_PACKAGESPATH` to aid in distinguishing packages from each other. Categories are `int`, `ext`, `td`, `app` and `project`.
 - `base` is required by every project, and defines general variables accessible to all projects and DCCs, such as `PROJECTS_PATH` which is an absolute path to where projects are stored relative a given platform, e.g. `/mnt/projects` on Linux
 - `maya`, `nuke` are standalone DCCs, installed on the local system and referenced by a packge
 - `core_pipeline` represents a shared, common library used on all shows and all DCCs
