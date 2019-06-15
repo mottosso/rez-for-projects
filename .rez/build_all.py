@@ -209,7 +209,7 @@ with stage("Pip installing.."):
 
         print(" - %s" % package)
         ext = os.path.join(packages_path, "ext")
-        call("rez wheel -y --install %s --prefix %s" % (package, ext))
+        call("rez pip -y --install %s --prefix %s" % (package, ext))
         count += 1
 
 print("-" * 30)
