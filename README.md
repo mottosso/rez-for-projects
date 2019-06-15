@@ -83,8 +83,8 @@ On either Windows or Unix, run the below.
 ```bash
 $ git clone --recursive https://github.com/mottosso/rez-for-projects.git
 $ cd rez-for-projects
-$ git checkout 1.3
-$ ./build_all
+$ git checkout 1.4
+$ ./build_all --clean
 ```
 
 ![autobuild](https://user-images.githubusercontent.com/2152766/56460565-6d38d580-639c-11e9-8f7e-76290cde60ac.gif)
