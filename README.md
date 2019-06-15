@@ -71,6 +71,7 @@ If you haven't got Rez installed, start here:
 
 ```bash
 pip install bleeding-rez -U
+rez bind --quickstart
 ```
 
 <br>
