@@ -81,7 +81,6 @@ On either Windows or Unix, run the below.
 > Don't forget about **`--recursive`**, due to the `rez-bundles` submodule.
 
 ```bash
-$ set PATH=<-- path/to/rez/Scripts/rez -->;%PATH%
 $ git clone --recursive https://github.com/mottosso/rez-for-projects.git
 $ cd rez-for-projects
 $ git checkout 1.3
