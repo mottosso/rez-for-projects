@@ -3,7 +3,6 @@
 
 name = "nuke"
 version = "11.3.3"
-category = "ext"
 requires = []
 
 build_command = "python -m rezutils build {root}"
@@ -15,9 +14,14 @@ tools = [
     "nuke",
 ]
 
-_icons = {
-    "32x32": "{root}/resources/icon_256x256.png",
-    "64x64": "{root}/resources/icon_256x256.png",
+_category = "app"
+_data = {
+    "label": "Foundry Nuke",
+    "color": "#251",
+    "icons": {
+        "32x32": "{root}/resources/icon_256x256.png",
+        "64x64": "{root}/resources/icon_256x256.png",
+    },
 }
 
 

@@ -1,10 +1,12 @@
 import os
 import sys
 import time
+import errno
 import shutil
 import zipfile
 import argparse
 import tempfile
+import subprocess
 
 try:
     from urllib.request import urlretrieve
@@ -15,12 +17,48 @@ except ImportError:
 parser = argparse.ArgumentParser()
 parser.add_argument("root")
 parser.add_argument("version")
-parser.add_argument("bucket", help=(
-    "Commit SHA to a specific bucket, compatible with this "
+parser.add_argument("--overwrite", action="store_true")
+parser.add_argument("--bucket", action="append", metavar=(
+    "https://github.com/.../master.zip"), help=(
+    "URLs to included buckets, compatible with this "
     "exact version of Scoop"
 ))
 
 opts = parser.parse_args()
+
+
+def ask(msg):
+    try:
+        raw_input
+    except NameError:
+        # Python 2 support
+        raw_input = input
+
+    try:
+        value = raw_input(msg).lower().rstrip()  # account for /n and /r
+        return value in ("", "y", "yes", "ok")
+    except EOFError:
+        return True  # On just hitting enter
+    except KeyboardInterrupt:
+        return False
+
+
+if int(os.getenv("REZ_BUILD_INSTALL")):
+    install_dir = os.environ["REZ_BUILD_INSTALL_PATH"]
+    exists = os.path.exists(install_dir)
+
+    if exists and os.listdir(install_dir):
+        print("Previous install found %s" % install_dir)
+
+        if opts.overwrite or ask("Overwrite existing install? [Y/n] "):
+            print("Cleaning existing install %s.." % install_dir)
+            assert subprocess.check_call(
+                'rmdir /S /Q "%s"' % install_dir, shell=True
+            ) == 0, "Failed"
+        else:
+            print("Aborted")
+            exit(1)
+
 
 variants = os.environ["REZ_BUILD_VARIANT_REQUIRES"].split()
 
@@ -38,7 +76,7 @@ def github_download(url, dst):
     fname = os.path.join(tempdir, os.path.basename(url))
     urlretrieve(url, fname)
 
-    yield "Extracting %s.." % os.path.basename(fname)
+    yield "Extracting %s.." % os.path.basename(repo)
 
     try:
         with zipfile.ZipFile(fname) as f:
@@ -49,7 +87,13 @@ def github_download(url, dst):
 
     # Inner directory formatted as `repo-branch`
     branch_dir = os.path.join(tempdir, "%s-%s" % (repo, branch))
-    os.makedirs(os.path.dirname(dst))
+
+    try:
+        os.makedirs(os.path.dirname(dst))
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
+
     shutil.copytree(branch_dir, dst)
     shutil.rmtree(tempdir)
 
@@ -60,33 +104,35 @@ print("Building into: %s" % build_dir)
 # SCOOP_HOME hierarchy
 home_dir = os.path.join(build_dir, "home")
 scoop_dir = os.path.join(home_dir, "apps", "scoop", "current")
-bucket_dir = os.path.join(home_dir, "buckets", "main")
+buckets_dir = os.path.join(home_dir, "buckets")
 cache_dir = os.path.join(home_dir, "cache")
 shims_dir = os.path.join(home_dir, "shims")
 
 # Download scoop
-stages = 4
+stages = 4 + len(opts.bucket)
 width = 24
-msg = "Installing scoopz [{:<%d}] ({}/4) {}       \r" % width
-data = {"stage": 1, "stepsize": "=" * (width / stages)}
+stepsize = width // stages
+msg = "Installing scoopz [{:<%d}] ({}/{}) {}       \r" % width
+data = {"stage": 1}
 
 
 def step(status):
-    progress = data["stepsize"] * data["stage"]
-    sys.stdout.write(msg.format(progress, data["stage"], status))
+    progress = "=" * stepsize * data["stage"]
+    sys.stdout.write(msg.format(progress, data["stage"], stages, status))
     data["stage"] += 1
 
 
-version = ".".join(opts.version.split(".")[:-1])  # Last digit is ours
+version = opts.version.rsplit(".", 1)[0]  # Last digit is ours
 version = version.replace(".", "-")  # Rez to GitHub tag
 url = "https://github.com/lukesampson/scoop/archive/%s.zip" % version
 for status in github_download(url, scoop_dir):
     step(status)
 
-bucket = opts.bucket
-url = "https://github.com/ScoopInstaller/Main/archive/%s.zip" % bucket
-for status in github_download(url, bucket_dir):
-    step(status)
+for url in opts.bucket:
+    _, repo, _, _ = url.rsplit("/", 3)
+    bucket_dir = os.path.join(buckets_dir, repo.lower())
+    for status in github_download(url, bucket_dir):
+        step(status)
 
 sys.stdout.write("\n")
 
@@ -105,15 +151,9 @@ shutil.copytree(
     os.path.join(build_dir, "python")
 )
 
-if int(os.getenv("REZ_BUILD_INSTALL")):
-    install_dir = os.environ["REZ_BUILD_INSTALL_PATH"]
-    print("Installing to %s.." % install_dir)
-    shutil.rmtree(install_dir)  # Created by Rez
-    patterns = shutil.ignore_patterns("*.pyc")
-    shutil.copytree(build_dir, install_dir, ignore=patterns)
-
 # Crippe automatic updates
 scoop_update_ps1 = os.path.join(scoop_dir, "libexec", "scoop-update.ps1")
+scoop_status_ps1 = os.path.join(scoop_dir, "libexec", "scoop-status.ps1")
 
 if not os.path.exists(scoop_update_ps1):
     print("WARNING: Couldn't disable Scoop's automatic updates, "
@@ -122,7 +162,22 @@ if not os.path.exists(scoop_update_ps1):
 else:
     print("Disabling automatic updates")
     with open(scoop_update_ps1, "w") as f:
-        f.write("exit 0")  # A winner every day!
+        f.write("exit 0\n")  # A winner every day!
+
+    with open(scoop_status_ps1, "w") as f:
+        f.write('success "Everything is ok!"\n')
+        f.write('exit 0\n')
+
+if int(os.getenv("REZ_BUILD_INSTALL")):
+    patterns = shutil.ignore_patterns("*.pyc")
+
+    try:
+        shutil.rmtree(install_dir)  # Created by Rez
+    except Exception:
+        # May not exist
+        pass
+
+    shutil.copytree(build_dir, install_dir, ignore=patterns)
 
 # Install
 print("Success!")

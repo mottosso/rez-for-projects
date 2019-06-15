@@ -5,7 +5,8 @@ name = "ftrack"
 version = "1.0.0"
 build_command = False
 
-environ = {
+_category = "int"
+_environ = {
     "FTRACK_URI": "ftrack.mystudio.co.jp",
     "FTRACK_PROTOCOL": "https",
 }
@@ -23,5 +24,5 @@ def commands():
     if not building and "FTRACK_API_KEY" not in os.environ:
         print("WARNING: FTRACK_API_KEY missing")
 
-    for key, value in this.environ.items():
+    for key, value in this._environ.items():
         env[key] = value

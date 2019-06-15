@@ -1,8 +1,7 @@
 build
 *.pyc
 __pycache__
-local_packages_path/**
-release_packages_path/**
+packages/**
 !.gitignore
 
 rez-internal-example

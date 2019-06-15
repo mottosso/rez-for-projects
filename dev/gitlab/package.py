@@ -4,7 +4,9 @@
 name = "gitlab"
 version = "1.1.2"
 build_command = False
-environ = {
+
+_category = "int"
+_environ = {
     "GITLAB_URI": "https://gitlab.mycompany.co.jp",
 }
 

@@ -1,9 +1,10 @@
 name = "rezutils"
 version = "1.2.5"
-category = "int"
 requires = [
     "python-2.7",
 ]
+
+_category = "int"
 
 
 def commands():

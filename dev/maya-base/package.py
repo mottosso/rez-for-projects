@@ -7,7 +7,8 @@ requires = [
 build_command = "python -m rezutils {root}"
 private_build_requires = ["rezutils-1"]
 
-environ = {
+_category = "int"
+_environ = {
 
     # General environment applicable to
     # every version of Maya.
@@ -57,9 +58,9 @@ def commands():
     global system
     global expandvars
 
-    environ = this.environ
+    _environ = this._environ
 
-    for key, value in environ.items():
+    for key, value in _environ.items():
         if isinstance(value, (tuple, list)):
             [env[key].append(expandvars(v)) for v in value]
         else:

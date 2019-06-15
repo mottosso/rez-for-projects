@@ -9,6 +9,8 @@ import collections
 
 dirname = os.path.dirname(__file__)
 repodir = os.path.dirname(dirname)
+packages_path = os.environ["REZ_RELEASE_PACKAGES_PATH"]
+
 
 # Some packages are directly from pip
 pip = [
@@ -40,6 +42,7 @@ order = [
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--verbose", action="store_true")
+parser.add_argument("--clean", action="store_true")
 opts = parser.parse_args()
 
 
@@ -63,12 +66,15 @@ def call(command, **kwargs):
     popen.wait()
 
     if popen.returncode != 0:
+        if isinstance(command, (tuple, list)):
+            command = ", ".join(command)
+
         raise OSError(
             # arg1, arg2 -------
             # Some error here
             # ------------------
             "\n".join([
-                "%s ".ljust(70, "-") % ", ".join(command),
+                "%s ".ljust(70, "-") % command,
                 "",
                 "\n".join(output),
                 "",
@@ -79,48 +85,39 @@ def call(command, **kwargs):
 
 @contextlib.contextmanager
 def stage(msg, timing=True):
-    sys.stdout.write(msg)
-    t0 = time.time()
+    print(msg)
+    time.sleep(0.2)
+    yield
 
-    try:
-        yield
-    except Exception:
-        print("fail")
-        raise
-    else:
-        if timing:
-            print("ok - %.2fs" % (time.time() - t0))
-        else:
-            print("ok")
+
+def exists(package):
+    return os.path.exists(
+        os.path.join(packages_path, package)
+    )
 
 
 print("-" * 30)
 print("")
-print("Auto-building..")
+print("Auto-building to %s.." % packages_path)
 print("")
 print("-" * 30)
 
-repos = (
-    "local_packages_path",
-    "release_packages_path",
-)
 
-for repo in repos:
-    path = os.path.join(repodir, repo)
-    _, existing, _ = next(os.walk(path))  # just directories
+path = os.path.join(repodir, "packages")
+_, existing, _ = next(os.walk(path))  # just directories
 
-    if existing:
-        with stage("Cleaning %s.. " % repo):
-            for attempt in range(3):
-                try:
-                    for package in existing:
-                        shutil.rmtree(os.path.join(path, package))
-                except OSError:
-                    sys.stderr.write(" retrying..")
-                    time.sleep(1)
-                    continue
-                else:
-                    break
+if opts.clean and existing:
+    with stage("Cleaning %s.. " % "packages"):
+        for attempt in range(3):
+            try:
+                for package in existing:
+                    shutil.rmtree(os.path.join(path, package))
+            except OSError:
+                sys.stderr.write(" retrying..")
+                time.sleep(1)
+                continue
+            else:
+                break
 
 count = 0
 
@@ -164,29 +161,60 @@ with stage("Sorting.. "):
     for _, package in packages.items():
         sorted_packages += package
 
-with stage("Building scoop.. "):
-    scoopz = next(pkg for pkg in sorted_packages if pkg["name"] == "scoopz")
-    sorted_packages.remove(scoopz)
-    call("rez build --clean --install", cwd=scoopz["base"])
-    count += 1
+with stage("Establishing layout.. "):
+    for subdir in ("proj",
+                   "app",
+                   "td",
+                   "int",
+                   "ext",
+                   ):
+        try:
+            os.makedirs(os.path.join(packages_path, subdir))
+        except OSError:
+            pass
+
+
+if not exists("scoopz"):
+    with stage("Building scoop.. "):
+        scoopz = next(
+            pkg for pkg in sorted_packages if pkg["name"] == "scoopz"
+        )
+        sorted_packages.remove(scoopz)
+        call("rez build --clean --install --release", cwd=scoopz["base"])
+        count += 1
 
 with stage("Scoop installing.. "):
     for package in scoop:
+        if exists(package):
+            continue
+
         print(" - %s" % package)
-        call("rez env scoopz -- install %s -y" % package)
+        ext = os.path.join(packages_path, "ext")
+        call("rez env scoopz -- install %s -y --prefix %s" % (package, ext))
         count += 1
 
 with stage("Building.. "):
     for package in sorted_packages:
+        if exists(package["name"]):
+            continue
+
         print(" - {name}-{version}".format(**package))
-        call("rez build --clean --install", cwd=package["base"])
+        call("rez build --clean --install --release", cwd=package["base"])
         count += 1
 
 with stage("Pip installing.."):
     for package in pip:
+        if exists(package):
+            continue
+
         print(" - %s" % package)
-        call("rez pip --install --release %s" % package)
+        ext = os.path.join(packages_path, "ext")
+        call("rez wheel -y --install %s --prefix %s" % (package, ext))
         count += 1
 
 print("-" * 30)
-print("Auto-built %d packages for you" % count)
+
+if not count:
+    print("Already up-to-date, use --clean to start fresh")
+else:
+    print("Auto-built %d packages for you" % count)

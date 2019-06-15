@@ -23,15 +23,18 @@ def init():
 
     scoop_home = tempfile.mkdtemp()
 
-    for subdir in ("apps", "buckets", "shims", "cache"):
+    for subdir in ("apps", "shims", "cache"):
         os.makedirs(os.path.join(scoop_home, subdir))
 
-    for source in (["apps", "scoop"],
-                   ["buckets", "main"]):
-        lib.junction(
-            os.path.join(package_home, *source),
-            os.path.join(scoop_home, *source),
-        )
+    lib.junction(
+        os.path.join(package_home, "apps", "scoop"),
+        os.path.join(scoop_home, "apps", "scoop"),
+    )
+
+    lib.junction(
+        os.path.join(package_home, "buckets"),
+        os.path.join(scoop_home, "buckets"),
+    )
 
     for shim in os.listdir(os.path.join(package_home, "shims")):
         src = os.path.join(package_home, "shims", shim)
@@ -42,15 +45,13 @@ def init():
 
 
 def install(home, request, verbose=False):
-    # scoop = os.path.join(home, "apps", "scoop", "current", "bin", "scoop.ps1")
-
     # TODO: This does not convert a Rez-like request to Scoop
     # E.g. python>=3.6 --> python-3.6.9
 
     lib.call([
         "powershell", "-ExecutionPolicy", "RemoteSigned",
-        "scoop", "install", request
-    ],
+        "scoop", "install"
+    ] + request,
         env=dict(os.environ, **{
             "SCOOP": home,
             "SCOOP_HOME": home,

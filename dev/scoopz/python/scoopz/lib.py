@@ -1,13 +1,22 @@
 import os
+import re
 import sys
 import json
+import shutil
 import subprocess
 
 from rez.utils.platform_ import platform_
 
 
 def _rez_name(name):
-    return name.replace("-", "_")
+    name = name.replace("-", "_")
+
+    # Remove tailing digits, such as 27 from python27
+    # NOTE: Poor-mans conversion of Scoop's poor sense
+    # of application versions
+    name = re.sub(r"(\d.)$", "", name)
+
+    return name
 
 
 def call(command, **kwargs):
@@ -52,13 +61,30 @@ def junction(src, dst):
     # Directory symbolic link supports package residing
     # on network, but temporary installation directory
     # residing locally = optimal performance
-    call('mklink /D "{dst}" "{src}"'.format(**locals()))
+    try:
+        assert not os.getenv("SCOOPZ_JUNCTION")
+        assert not os.getenv("SCOOPZ_COPY")
+        return call('mklink /D "{dst}" "{src}"'.format(**locals()))
+    except (AssertionError, OSError):
+        # Supported since Windows 10 14972 (Dec 2016)
+        pass
+
+    # Hardlinks are equally good
+    try:
+        assert not os.getenv("SCOOPZ_COPY")
+        return call('mklink /J "{dst}" "{src}"'.format(**locals()))
+    except (AssertionError, OSError):
+        # Supported within the same disk partition
+        pass
+
+    # Last resort, wholesale copy of the directory
+    # This takes about 10 seconds, 100x longer than
+    # mklink. But, what can you do?
+    return shutil.copytree(src, dst)
 
 
 class Distribution(object):
     def __init__(self, home, name):
-        name = _rez_name(name)
-
         self._name = name
         self._home = home
         self._path = os.path.join(home, "apps", name)
@@ -73,9 +99,19 @@ class Distribution(object):
         self._root = os.path.join(self._path, self._version)
 
         # Metadata is stored locally, as JSON documents
-        fname = os.path.join(home, "buckets", "main", "bucket", name + ".json")
-        with open(fname) as f:
-            self._metadata = json.load(f)
+        # Except it isn't clear from which bucket a given app
+        # it coming from, so we must search for it.
+        buckets_dir = os.path.join(home, "buckets")
+        for bucket in os.listdir(buckets_dir):
+            fname = os.path.join(buckets_dir, bucket, "bucket", name + ".json")
+
+            try:
+                with open(fname) as f:
+                    self._metadata = json.load(f)
+            except IOError:
+                continue
+            else:
+                break
 
     def __str__(self):
         return "%s-%s" % (self.name, self.version)
@@ -168,7 +204,7 @@ class Distribution(object):
 
     @property
     def name(self):
-        return self._name
+        return _rez_name(self._name)
 
     @property
     def version(self):

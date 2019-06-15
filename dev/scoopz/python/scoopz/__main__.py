@@ -44,6 +44,9 @@ def stage(msg, timing=True):
             tell("ok - %.2fs" % (time.time() - t0))
         else:
             tell("ok")
+    finally:
+        # Give the user a chance to follow along
+        time.sleep(0.2)
 
 
 def ask(msg):
@@ -100,7 +103,8 @@ def report(new, exists, destination):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("request", help=(
+    parser.add_argument("cwd", help="Current working directory")
+    parser.add_argument("request", nargs="+", help=(
         "Packages to install, e.g. python curl"))
     parser.add_argument("--verbose", action="store_true", help=(
         "Include Scoop output amongst scoopz messages."))
@@ -129,8 +133,15 @@ if __name__ == '__main__':
         else config.local_packages_path
     )
 
+    if not os.path.isabs(packagesdir):
+        packagesdir = os.path.join(opts.cwd, packagesdir)
+
+    packagesdir = os.path.abspath(packagesdir)
+    packagesdir = os.path.normpath(packagesdir)
+
     try:
-        with stage("Initialising Scoop... "):
+        version = os.getenv("REZ_SCOOPZ_VERSION", "0.0.0")
+        with stage("Initialising Scoop %s... " % version):
             home = init()
 
         with stage("Reading package lists... "):
@@ -192,5 +203,12 @@ if __name__ == '__main__':
 
     finally:
         sys.stdout.write("Cleaning up.. ")
-        lib.call('rmdir /S /Q "%s"' % home)
-        print("ok")
+
+        try:
+            lib.call('rmdir /S /Q "%s"' % home)
+        except (NameError, OSError):
+            print("fail")
+            exit(1)
+        else:
+            print("ok")
+            exit(0)

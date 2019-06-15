@@ -2,8 +2,7 @@
 # of the local package.
 
 name = "maya"
-version = "2018.0.2"
-category = "ext"
+version = "2018.0.3"
 requires = []
 
 build_command = "python -m rezutils build {root}"
@@ -13,11 +12,13 @@ private_build_requires = ["rezutils-1"]
 # are built and deployed with this package.
 tools = [
     "maya",
+    "mayapy",
     "render",
     "mayabatch",
     "mayagui_lic",
 ]
 
+_category = "app"
 _data = {
     "label": "Autodesk Maya",
     "color": "#251",

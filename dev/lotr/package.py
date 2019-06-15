@@ -12,12 +12,10 @@ requires = [
 ]
 
 build_command = "python -m rezutils {root}"
+private_build_requires = ["rezutils-1"]
 
-private_build_requires = [
-    "rezutils-1",
-]
-
-environ = {
+_category = "proj"
+_environ = {
     "PROJECT_NAME": "Lord of the Rings",
     "PROJECT_PATH": "{env.PROJECTS_PATH}/lotr",
 
@@ -31,7 +29,7 @@ def commands():
     global this
     global expandvars
 
-    for key, value in this.environ.items():
+    for key, value in this._environ.items():
         if isinstance(value, (tuple, list)):
             [env[key].append(expandvars(v)) for v in value]
         else:

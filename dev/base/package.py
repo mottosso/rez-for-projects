@@ -6,8 +6,9 @@ requires = [
     "ftrack-1",
     "gitlab-1",
 ]
+_category = "int"
 
-environ = {
+_environ = {
     "GITLAB_URI": "https://gitlab.mycompany.co.jp",
     "PROJECTS_PATH": "{this.projects_path}"
 }
@@ -28,12 +29,12 @@ def commands():
     else:
         this.projects_path = "/mnt/projects"
 
-    for key, value in this.environ.items():
+    for key, value in this._environ.items():
         if isinstance(value, (tuple, list)):
 
             # `expandvars` is called, even though it currently
             # isn't necessary, so as to enable edits to the above
-            # `environ` that reference system environment variables,
+            # `_environ` that reference system environment variables,
             # without changing the logic of the below.
             [env[key].append(expandvars(v)) for v in value]
         else:

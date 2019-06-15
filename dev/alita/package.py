@@ -2,9 +2,14 @@ late = locals()["late"]
 
 name = "alita"
 version = "0.3.17"
-category = "int"
 
 build_command = False
+
+_category = "proj"
+_data = {
+    "label": "Alita - Battle Angel",
+    "hidden": ["dev_maya"],
+}
 
 _requires = {
     "any": [
@@ -21,6 +26,9 @@ _requires = {
         "~photoshop-2018",
         "~terminal",
         "~texteditor",
+
+        # Hidden
+        "~dev_maya-2018",
     ],
 
     # Requirements relative a request

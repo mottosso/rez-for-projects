@@ -4,6 +4,13 @@ Install anything from [Scoop](https://scoop.sh/) as a Rez package.
 
 <br>
 
+### Features
+
+- **Large selection** Install any of the [500+ available packages](https://github.com/ScoopInstaller/Main/tree/master/bucket) from Scoop
+- **Try before you buy** Like `apt-get` and `yum`, no packages are actually installed until you've witnessed and confirmed what Scoop comes up with, including complex dependencies.
+
+<br>
+
 ### Installation
 
 This repository is a Rez package, here's how you can install it.
@@ -29,14 +36,16 @@ $ python --version
 Python 3.7.3
 ```
 
-It may also be used from within a context.
+Which is the equivalent of calling..
 
 ```bash
 $ rez env scoopz
 > $ install curl
 ```
 
-And, for the advanced user, as a Python package. Note that it requires Rez itself to be present as a package, along with a copy of Python that isn't coming from Rez.
+And, for the advanced user, it may also be used as a Python package. Note that it requires Rez itself to be present as a package, along with a copy of Python that isn't coming from Rez.
+
+> How does this work?
 
 ```bash
 $ rez env python rez scoopz
@@ -97,3 +106,14 @@ $ rez env scoopz -- install python
 `----------------------------------`
 
 ```
+
+<br>
+
+### FAQ
+
+> Why rez-scoopz? Why not X?
+
+This project came about as a requirement for a separate project, here are the developer "journal" from there.
+
+- https://gist.github.com/mottosso/0945b2d19a1920e999fbfb61f4f301a3
+- https://gist.github.com/mottosso/5492d55f20b1f38979c8577fc5f5cfbc

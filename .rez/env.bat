@@ -11,12 +11,8 @@ IF ERRORLEVEL 1 (
 )
 
 :: Install packages here
-set LOCAL_PACKAGES=%userprofile%\packages
-set REZ_LOCAL_PACKAGES_PATH=%~dp0..\local_packages_path
-set REZ_RELEASE_PACKAGES_PATH=%~dp0..\release_packages_path
-
-:: Look for packages here
-set REZ_PACKAGES_PATH=%REZ_PACKAGES_PATH%;%LOCAL_PACKAGES%;%REZ_RELEASE_PACKAGES_PATH%;%REZ_LOCAL_PACKAGES_PATH%
+set REZ_RELEASE_PACKAGES_PATH=%~dp0..\packages
+set REZ_CONFIG_FILE=%~dp0..\rezconfig.py
 
 :: "Aliases"
 doskey re=rez env $*

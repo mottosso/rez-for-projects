@@ -1,6 +1,5 @@
 name = "texteditor"
 version = "2.0.1"
-category = "ext"
 requires = []
 
 build_command = "python -m rezutils build {root}"
@@ -10,9 +9,12 @@ tools = [
     "texteditor",
 ]
 
-_icons = {
-    "32x32": "{root}/resources/icon_128.png",
-    "64x64": "{root}/resources/icon_128.png",
+_category = "app"
+_data = {
+    "icons": {
+        "32x32": "{root}/resources/icon_128.png",
+        "64x64": "{root}/resources/icon_128.png",
+    }
 }
 
 

@@ -6,9 +6,12 @@ requires = []
 build_command = "python -m rezutils build {root}"
 private_build_requires = ["rezutils-1"]
 
-_icons = {
-    "32x32": "{root}/resources/icon_128.png",
-    "64x64": "{root}/resources/icon_128.png",
+_category = "app"
+_data = {
+    "icons": {
+        "32x32": "{root}/resources/icon_128.png",
+        "64x64": "{root}/resources/icon_128.png",
+    }
 }
 
 

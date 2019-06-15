@@ -11,7 +11,8 @@ requires = [
     "~maya>=2016,<2019",
 ]
 
-environ = {
+_category = "ext"
+_environ = {
     "MGEAR_SHIFTER_CUSTOMSTEP_PATH": "{root}/python/mGear/build/custom_steps",
     "MGEAR_SHIFTER_COMPONENT_PATH": "{root}/python/mGear/build/components",
     "MGEAR_SYNOPTIC_PATH": "{root}/python/mGear/env/synoptic",
@@ -23,9 +24,9 @@ def commands():
     global this
     global expandvars
 
-    environ = this.environ
+    _environ = this._environ
 
-    for key, value in environ.items():
+    for key, value in _environ.items():
         if isinstance(value, (tuple, list)):
             [env[key].append(expandvars(v)) for v in value]
         else:
