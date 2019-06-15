@@ -104,7 +104,7 @@ print("-" * 30)
 
 
 path = os.path.join(repodir, "packages")
-_, existing, _ = next(os.walk(path))  # just directories
+_, existing, _ = next(os.walk(path), ([], [], []))  # just directories
 
 if opts.clean and existing:
     with stage("Cleaning %s.. " % "packages"):
@@ -209,7 +209,7 @@ with stage("Pip installing.."):
 
         print(" - %s" % package)
         ext = os.path.join(packages_path, "ext")
-        call("rez pip -y --install %s --prefix %s" % (package, ext))
+        call("rez pip --install %s --prefix %s" % (package, ext))
         count += 1
 
 print("-" * 30)
