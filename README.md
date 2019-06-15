@@ -61,30 +61,16 @@ $ git checkout 1.0
 **Prerequisites**
 
 1. Windows, Linux or OSX
-1. [bleeding-rez](https://github.com/mottosso/bleeding-rez)
-1. `python` available on your PATH
-1. `rez` available on PATH
 
 **Install**
-
-If you haven't got Rez installed, start here:
 
 ```bash
 pip install bleeding-rez -U
 rez bind --quickstart
-```
-
-<br>
-
-On either Windows or Unix, run the below.
-
-> Don't forget about **`--recursive`**, due to the `rez-bundles` submodule.
-
-```bash
-$ git clone --recursive https://github.com/mottosso/rez-for-projects.git
-$ cd rez-for-projects
-$ git checkout 1.4
-$ ./build_all --clean
+git clone https://github.com/mottosso/rez-for-projects.git
+cd rez-for-projects
+git checkout 1.4
+./build_all --clean
 ```
 
 ![autobuild](https://user-images.githubusercontent.com/2152766/56460565-6d38d580-639c-11e9-8f7e-76290cde60ac.gif)
@@ -95,31 +81,11 @@ Now enter a shell.
 
 ```bash
 $ ./shell
- ==============================
-
-  Welcome to rez-for-projects!
-
- This demo illustrates how projects
- and software can happily co-exist
-           with Rez.
-
- ==============================
-
- Usage
- -----
- 
- $ rez env         # Establish a Rez environment
- $ re              # ..using an alias
- $ re alita        # In a given project
- $ re alita maya   # With a given application
-
- $ rez build --install  # Edit and release new package
- $ ri                   # ..using an alias
-
-$ 
+$ rez env alita maya
+> $
 ```
 
-The shell script configures Rez to look for packages in this repository, exposes aliases `re` and `ri` for common Rez commands and provides you with a greeting message. It does not implement any custom behavior, everything is native to Rez.
+The shell script configures Rez to look for packages in this repository.
 
 <div align="center"><img src=https://user-images.githubusercontent.com/2152766/56455060-cf201d80-6351-11e9-93af-d6ae0721bb4e.gif></div>
 
