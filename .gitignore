@@ -2,6 +2,6 @@ build
 *.pyc
 __pycache__
 packages/**
-!.gitignore
+!packages/README.md
 
 rez-internal-example
