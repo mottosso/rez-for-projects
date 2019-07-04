@@ -1,11 +1,7 @@
 import os
 
-# Destination paths, during `rez build --install` or `rez release`
-# local_packages_path = os.getenv("REZ_LOCAL_PACKAGES_PATH", "~/packages")
-release_packages_path = os.getenv("REZ_RELEASE_PACKAGES_PATH")
-
-# assert local_packages_path, "Missing REZ_LOCAL_PACKAGES_PATH"
-assert release_packages_path, "Missing REZ_RELEASE_PACKAGES_PATH"
+# Destination paths, during `rez build --install --release`
+release_packages_path = os.path.join(os.path.dirname(__file__), "packages")
 
 # Subdirectories of packages_path
 categories = ("int", "ext", "td", "proj", "app")
@@ -16,7 +12,10 @@ packages_path = [
     for category in categories
 ]
 
-# Your rez-bind packages, like platform and os
+# Your localised packages
+packages_path.insert(0, os.path.expanduser("~/.packages"))
+
+# Your development packages
 packages_path.insert(0, os.path.expanduser("~/packages"))
 
 
@@ -25,7 +24,6 @@ def package_preprocess_function(this, data):
 
     # Enable a package to override path from package.py
     try:
-        # data["config"]["local_packages_path"]
         data["config"]["release_packages_path"]
     except KeyError:
         pass
@@ -37,9 +35,9 @@ def package_preprocess_function(this, data):
         assert category in categories
 
     except KeyError:
-        raise InvalidPackageError(
-            "%s did not provide a `_category`" % data["name"]
-        )
+        # Support for packages without categories,
+        # assumed to be external.
+        category = "ext"
 
     except AssertionError:
         raise InvalidPackageError(
@@ -51,8 +49,19 @@ def package_preprocess_function(this, data):
     config["release_packages_path"] = os.path.join(
         release_packages_path, "%s" % category
     )
-    # config["local_packages_path"] = os.path.join(
-    #     local_packages_path, "%s" % category
-    # )
 
     data["config"] = config
+
+
+# These packages are typically overly specific to your platform
+# These maps allow for e.g. `windows-10.0.1803` packages to run
+# to run on `windows-10.0.1903`
+platform_map = {
+    "os": {
+
+        # Technically, 6.2 is Windows 8, 6.1 is Windows 7
+        r"windows-6(.*)": r"windows-10",
+
+        r"windows-10(.*)": r"windows-10",
+    },
+}
