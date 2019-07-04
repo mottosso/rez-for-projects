@@ -38,6 +38,12 @@ IGNORE = [
 # it this many attempts before throwing our hands up
 RETRY = 3
 
+try:
+    # For Python 2
+    unicode
+except NameError:
+    unicode = str
+
 
 def retry(func):
     def decorator(*args, **kwargs):
