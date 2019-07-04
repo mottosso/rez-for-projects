@@ -28,7 +28,7 @@ scoop = [
 # having been built first.
 order = [
     "scoopz",
-    "rezutils",
+    "rezutil",
     "welcome",
     "ftrack",
     "gitlab",
