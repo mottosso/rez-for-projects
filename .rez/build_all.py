@@ -85,6 +85,7 @@ def exists(package):
 print("-" * 30)
 print("")
 print("Auto-building to %s.." % packages_path)
+print("Using python-%s.%s" % sys.version_info[:2])
 print("")
 print("-" * 30)
 

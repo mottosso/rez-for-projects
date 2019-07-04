@@ -1,5 +1,5 @@
 name = "rezutil"
-version = "1.3.1"
+version = "1.3.2"
 requires = [
     "python-2.7+,<4",
 ]
