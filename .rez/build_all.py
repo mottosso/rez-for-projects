@@ -12,22 +12,9 @@ repodir = os.path.dirname(dirname)
 packages_path = os.environ["REZ_RELEASE_PACKAGES_PATH"]
 
 
-# Some packages are directly from pip
-pip = [
-    "Qt.py==1.1.0",
-    "pyblish-base==1.7.2",
-    "pyblish-lite==0.8.4",
-    "pyblish-qml==1.9.9",
-]
-
-scoop = [
-    "python",
-]
-
 # Some packages depend on other packages
 # having been built first.
 order = [
-    "scoopz",
     "rezutil",
     "welcome",
     "ftrack",
@@ -36,7 +23,6 @@ order = [
     "core_pipeline",
     "maya",
     "maya_base",
-    "pip",
 ]
 
 
@@ -173,26 +159,6 @@ with stage("Establishing layout.. "):
         except OSError:
             pass
 
-
-if not exists("scoopz"):
-    with stage("Building scoop.. "):
-        scoopz = next(
-            pkg for pkg in sorted_packages if pkg["name"] == "scoopz"
-        )
-        sorted_packages.remove(scoopz)
-        call("rez build --clean --install --release", cwd=scoopz["base"])
-        count += 1
-
-with stage("Scoop installing.. "):
-    for package in scoop:
-        if exists(package):
-            continue
-
-        print(" - %s" % package)
-        ext = os.path.join(packages_path, "ext")
-        call("rez env scoopz -- install %s -y --prefix %s" % (package, ext))
-        count += 1
-
 with stage("Building.. "):
     for package in sorted_packages:
         if exists(package["name"]):
@@ -200,16 +166,6 @@ with stage("Building.. "):
 
         print(" - {name}-{version}".format(**package))
         call("rez build --clean --install --release", cwd=package["base"])
-        count += 1
-
-with stage("Pip installing.."):
-    for package in pip:
-        if exists(package):
-            continue
-
-        print(" - %s" % package)
-        ext = os.path.join(packages_path, "ext")
-        call("rez pip --install %s --prefix %s" % (package, ext))
         count += 1
 
 print("-" * 30)
