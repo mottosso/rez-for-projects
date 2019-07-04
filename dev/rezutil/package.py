@@ -1,7 +1,7 @@
-name = "rezutils"
-version = "1.2.5"
+name = "rezutil"
+version = "1.3.1"
 requires = [
-    "python-2.7",
+    "python-2.7+,<4",
 ]
 
 _category = "int"

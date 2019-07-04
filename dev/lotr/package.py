@@ -11,8 +11,8 @@ requires = [
     "~mari-0.2",
 ]
 
-build_command = "python -m rezutils {root}"
-private_build_requires = ["rezutils-1"]
+build_command = "python -m rezutil build {root}"
+private_build_requires = ["rezutil-1"]
 
 _category = "proj"
 _environ = {

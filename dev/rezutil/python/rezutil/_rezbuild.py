@@ -204,7 +204,7 @@ def main(argv):
                         type=lambda s: unicode(s, 'utf8'),
                         default=os.getenv("REZ_BUILD_INSTALL_PATH"))
     parser.add_argument("--install", type=bool,
-                        default=bool(os.getenv("REZ_BUILD_INSTALL")))
+                        default=bool(int(os.getenv("REZ_BUILD_INSTALL", "0"))))
 
     opts = parser.parse_args(argv)
 

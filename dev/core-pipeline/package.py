@@ -1,8 +1,8 @@
 name = "core_pipeline"
 version = "2.1.0"
 
-build_command = "python -m rezutils {root}"
-private_build_requires = ["rezutils-1"]
+build_command = "python -m rezutil {root}"
+private_build_requires = ["rezutil-1"]
 
 _category = "int"
 _environ = {

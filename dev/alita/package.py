@@ -1,34 +1,28 @@
-late = locals()["late"]
-
 name = "alita"
-version = "0.3.17"
+version = "0.3.19"
 
-build_command = False
+build_command = "python -m rezutil build {root}"
+private_build_requires = ["rezutil-1"]
 
+# Variables unrelated to Rez are prefixed with `_`
+# These are managed by the recipient via the Rez API
 _category = "proj"
 _data = {
     "label": "Alita - Battle Angel",
-    "hidden": ["dev_maya"],
+    "icon": "{root}/resources/icon_{w}x{h}.png"
 }
 
 _requires = {
     "any": [
         "welcome-1",
         "base-1",
-        "python-2.7",
 
         # Supported DCCs, if either of these are used,
         # this must be their version.
         "~maya-2018",
+        "~dev_maya2",  # hidden
         "~nuke-11",
-        "~houdini-fx.17",
-        "~aftereffects-cs6",
-        "~photoshop-2018",
         "~terminal",
-        "~texteditor",
-
-        # Hidden
-        "~dev_maya-2018",
     ],
 
     # Requirements relative a request
@@ -82,6 +76,14 @@ _environ = {
     }
 }
 
+# ---------
+#
+# Internal
+#
+# ---------
+
+late = locals()["late"]
+
 
 @late()
 def requires():
@@ -106,6 +108,7 @@ def requires():
 def commands():
     global env
     global this
+    global alias
     global request
     global expandvars
 

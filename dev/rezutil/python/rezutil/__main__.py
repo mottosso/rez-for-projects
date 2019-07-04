@@ -4,7 +4,7 @@ import argparse
 argv1 = list(sys.argv[1:2])
 argv2 = list(sys.argv[2:])
 
-parser = argparse.ArgumentParser("rezutils", add_help=False)
+parser = argparse.ArgumentParser("rezutil", add_help=False)
 parser.add_argument("command")
 
 if argv1[-1] == ["--help"]:

@@ -1,4 +1,7 @@
 $here = split-path -parent $PSCommandPath
-. $here\.rez\env.ps1
+$repo = split-path -parent $here
+
+$env:REZ_CONFIG_FILE=join-path $repo "rezconfig.py"
+
 & python $here\.rez\build_all.py $args
 pause

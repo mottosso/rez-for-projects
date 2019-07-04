@@ -5,8 +5,8 @@ name = "houdini"
 version = "fx.17.5.1"
 requires = []
 
-build_command = "python -m rezutils build {root}"
-private_build_requires = ["rezutils-1"]
+build_command = "python -m rezutil build {root}"
+private_build_requires = ["rezutil-1"]
 
 # Cross-platform binaries (i.e. shell scripts)
 # are built and deployed with this package.

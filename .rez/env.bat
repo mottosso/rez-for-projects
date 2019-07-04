@@ -10,8 +10,6 @@ IF ERRORLEVEL 1 (
 	goto norez
 )
 
-:: Install packages here
-set REZ_RELEASE_PACKAGES_PATH=%~dp0..\packages
 set REZ_CONFIG_FILE=%~dp0..\rezconfig.py
 
 :: "Aliases"

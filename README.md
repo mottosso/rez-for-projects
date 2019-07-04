@@ -73,6 +73,22 @@ git checkout 1.4
 ./build_all --clean
 ```
 
+> This currently only works on Windows due to `python` being installed using `rez-scoopz`. You can work around it, by building each project yourself, excluding `python`. E.g. `cd alita && rez build --install`
+
+<details>
+    <summary><b>Problems?</b></summary>
+
+If anything broke during auto-build, try building the broken package explicitly.
+
+```bash
+$ cd dev\alita
+$ rez build --install --release
+```
+
+This should reproduce the error, and also include the error message or stack trace to help you narrow down the problem.
+
+</details>
+
 ![autobuild](https://user-images.githubusercontent.com/2152766/56460565-6d38d580-639c-11e9-8f7e-76290cde60ac.gif)
 
 > The build script will make contained packages available for resolve
@@ -100,7 +116,7 @@ The shell script configures Rez to look for packages in this repository.
 
 ##### What is Rez
 
-Broadly speaking, Rez is used to optimise parallelism amongst humans in a collaborative endeavors, especially those in visual effects. Every human added to a project comes with some amount of overhead to tooling and communication. At a certain scale - beyond 10-50 humans - that overhead needs management and that's where Rez fits in; it can help increase parallelism between one human having a software issue and another addressing it, with minimal impact on the remaining 48 humans.
+Rez can reproduce an exact environment with exact versions of software and software libraries that are all compatible with each other. We leverage this in this project to establish an environment given a particular project and DCC, like `alita` and `maya`, where the project determines which `maya` it is compatible with, and together they define a series of additional libraries - such as the pipeline itself - that they together are compatible with.
 
 <details>
   <summary>User Stories</summary>
@@ -781,13 +797,24 @@ Internal mono-repo of projects and applications.
 
 ### Terminal
 
-Rez works on Windows and Linux (and probably OSX), but on Windows the integration with `cmd.exe` and `powershell` has one critical flaw: no history. Which means that hitting that up-arrow doesn't get you a previous command, instead it does nothing. It also lacks the color Linux users enjoy.
+Rez works on Windows, Linux and OSX.
 
-Until that has been addressed, here are some options that solve this problem.
+On Windows, you'll want to increase the number of buffers so as to maintain the ability to step through your history of previously typed commands.
 
-- [ConEmu](https://conemu.github.io/)
-- [cmder](https://cmder.net/)
-- [Alacritty](https://github.com/jwilm/alacritty)
+- See [wiki](https://github.com/mottosso/bleeding-rez/wiki/Shells#windows-and-command-line-history) for details on how to do that.
+
+<br>
+
+### Default Project
+
+Amongst the many packages shipping with this project is one called `default_project`. This can be used to generate a project package.
+
+```bash
+$ cd %USERPROFILE%
+$ rez env default_project -- create myProject
+Creating "C:\Users\marcus\myProject"
+Continue? [Y/n] y
+```
 
 <br>
 

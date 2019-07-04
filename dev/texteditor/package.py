@@ -2,8 +2,8 @@ name = "texteditor"
 version = "2.0.1"
 requires = []
 
-build_command = "python -m rezutils build {root}"
-private_build_requires = ["rezutils-1"]
+build_command = "python -m rezutil build {root}"
+private_build_requires = ["rezutil-1"]
 
 tools = [
     "texteditor",

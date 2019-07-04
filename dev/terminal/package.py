@@ -3,8 +3,8 @@ version = "1.3.12"
 category = "ext"
 requires = []
 
-build_command = "python -m rezutils build {root}"
-private_build_requires = ["rezutils-1"]
+build_command = "python -m rezutil build {root}"
+private_build_requires = ["rezutil-1"]
 
 _category = "app"
 _data = {

@@ -2,11 +2,11 @@
 # of the local package.
 
 name = "nuke"
-version = "11.3.3"
+version = "11.3.4"
 requires = []
 
-build_command = "python -m rezutils build {root}"
-private_build_requires = ["rezutils-1"]
+build_command = "python -m rezutil build {root}"
+private_build_requires = ["rezutil-1.3.1+"]
 
 # Cross-platform binaries (i.e. shell scripts)
 # are built and deployed with this package.
@@ -44,4 +44,5 @@ def commands():
 
     # Add specific names to executables made
     # available by this package.
+    env.PATH.append("{root}/bin")
     alias("nuke", "notepad")
