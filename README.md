@@ -73,8 +73,6 @@ git checkout 1.4
 ./build_all --clean
 ```
 
-> This currently only works on Windows due to `python` being installed using `rez-scoopz`. You can work around it, by building each project yourself, excluding `python`. E.g. `cd alita && rez build --install`
-
 <details>
     <summary><b>Problems?</b></summary>
 

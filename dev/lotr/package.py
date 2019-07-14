@@ -1,5 +1,5 @@
 name = "lotr"
-version = "1.13.2"
+version = "1.13.3"
 
 requires = [
     "base-1",
@@ -14,6 +14,10 @@ requires = [
 build_command = "python -m rezutil build {root}"
 private_build_requires = ["rezutil-1"]
 
+_data = {
+    "label": "Lord of the Rings",
+    "icon": "{root}/resources/icon_{width}x{height}.png"
+}
 _category = "proj"
 _environ = {
     "PROJECT_NAME": "Lord of the Rings",

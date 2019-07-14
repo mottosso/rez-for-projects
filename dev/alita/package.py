@@ -1,5 +1,5 @@
 name = "alita"
-version = "0.3.19"
+version = "0.3.20"
 
 build_command = "python -m rezutil build {root}"
 private_build_requires = ["rezutil-1"]
@@ -9,7 +9,7 @@ private_build_requires = ["rezutil-1"]
 _category = "proj"
 _data = {
     "label": "Alita - Battle Angel",
-    "icon": "{root}/resources/icon_{w}x{h}.png"
+    "icon": "{root}/resources/icon_{width}x{height}.png"
 }
 
 _requires = {
@@ -108,7 +108,6 @@ def requires():
 def commands():
     global env
     global this
-    global alias
     global request
     global expandvars
 

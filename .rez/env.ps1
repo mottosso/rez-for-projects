@@ -2,6 +2,7 @@ $here = split-path -parent $PSCommandPath
 $repo = split-path -parent $here
 
 $env:REZ_CONFIG_FILE=join-path $repo "rezconfig.py"
+$env:ALLZPARK_CONFIG_FILE=join-path $repo "allzparkconfig.py"
 
 function prompt {"<rez> $ "}
 

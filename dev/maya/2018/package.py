@@ -2,7 +2,7 @@
 # of the local package.
 
 name = "maya"
-version = "2018.0.4"
+version = "2018.0.5"
 requires = []
 
 build_command = "python -m rezutil build {root}"
@@ -22,10 +22,7 @@ _category = "app"
 _data = {
     "label": "Autodesk Maya",
     "color": "#251",
-    "icons": {
-        "32x32": "{root}/resources/icon_256x256.png",
-        "64x64": "{root}/resources/icon_256x256.png",
-    },
+    "icon": "{root}/resources/icon_{width}x{height}.png",
 }
 
 
