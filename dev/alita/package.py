@@ -1,5 +1,5 @@
 name = "alita"
-version = "0.3.20"
+version = "0.3.25"
 
 build_command = "python -m rezutil build {root}"
 private_build_requires = ["rezutil-1"]
@@ -19,9 +19,9 @@ _requires = {
 
         # Supported DCCs, if either of these are used,
         # this must be their version.
-        "~maya-2018",
+        "~maya==2017.0.4|==2018.0.5",
         "~dev_maya2",  # hidden
-        "~nuke-11",
+        "~nuke==11.3.4",
         "~terminal",
     ],
 
@@ -43,6 +43,7 @@ _environ = {
 
         # For locating in e.g. ftrack
         "PRODUCTION_TRACKER_ID": "alita-123",
+
     },
 
     # Global overrides for TDs and free-form scripts
@@ -51,6 +52,7 @@ _environ = {
     # by artists not familiar or involved with Rez
     # or overall package distribution.
     "maya": {
+        "MYPATH": "{env.REZ_MAYA_MAJOR_VERSION}/some/dir",
         "MAYA_COLOR_MANAGEMENT_POLICY_FILE": [
             "{env.PROJECT_PATH}/maya/color_management"
             "/default_synColorConfig.xml"

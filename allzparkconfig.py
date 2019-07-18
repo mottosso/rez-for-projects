@@ -1,15 +1,22 @@
 import os
 
-from allzpark import allzparkconfig
-
 HERE = os.path.dirname(__file__)
 PACKAGES = os.path.join(HERE, "packages")
 
-projects = os.listdir(os.path.join(PACKAGES, "proj"))
+projects = [
+    "alita",
+    "lotr",
+    "panzerkunst",
+    "spiderman",
+    "vector",
+    "hulk",
+    "metroid",
+]
+
 applications = os.listdir(os.path.join(PACKAGES, "app"))
 
 
-def read_package_data(package):
+def metadata_from_package(package):
     data = getattr(package, "_data", {})
 
     data = {
@@ -18,8 +25,6 @@ def read_package_data(package):
         "icon": data.get("icon", None),
         "hidden": data.get("hidden", False),
     }
-
-    # data = allzparkconfig._read_package_data(package)
 
     # Backwards compatibility
     backwards_icon = getattr(package, "_icons", {}).get("32x32")

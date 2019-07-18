@@ -1,14 +1,12 @@
 name = "lotr"
-version = "1.13.3"
+version = "1.13.4"
 
 requires = [
     "base-1",
 
     # DCCs
-    "~maya-2011",
+    "~maya-2018|2019",
     "~nuke-9",
-    "~houdinifx-11",
-    "~mari-0.2",
 ]
 
 build_command = "python -m rezutil build {root}"
